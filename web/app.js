@@ -1,5 +1,12 @@
 const SUPPORTED_LANGUAGES = ["en", "fr"];
-const PREVIEW_PAGE_SIZE = 25;
+const DEFAULT_PREFERENCES = {
+  theme: "system",
+  pageSize: 50,
+  excludedDirs: [".venv", "venv", "env", ".env", "temp", "tmp", ".temp", ".tmp", "node_modules", ".git", "__pycache__", ".idea", ".vscode"],
+  excludedExtensions: [".tmp", ".bak"],
+  askBackupBeforeApply: true
+};
+const HISTORY_LIMIT = 50;
 const dictionaries = {};
 const elements = {
   folder: document.querySelector("#folderPath"),
@@ -28,6 +35,8 @@ const elements = {
   previewResults: document.querySelector("#previewResults"),
   previewCount: document.querySelector("#previewCount"),
   previewSummary: document.querySelector("#previewSummary"),
+  previewSearch: document.querySelector("#previewSearch"),
+  previewFilterCount: document.querySelector("#previewFilterCount"),
   previewRows: document.querySelector("#previewRows"),
   previewPagination: document.querySelector("#previewPagination"),
   previousPreviewPage: document.querySelector("#previousPreviewPage"),
@@ -40,6 +49,15 @@ const elements = {
   undoLogStatus: document.querySelector("#undoLogStatus"),
   languageSelect: document.querySelector("#languageSelect"),
   forgetPreferences: document.querySelector("#forgetPreferences"),
+  themeSelect: document.querySelector("#themeSelect"),
+  pageSizeSelect: document.querySelector("#pageSizeSelect"),
+  defaultExcludedDirs: document.querySelector("#defaultExcludedDirs"),
+  defaultExcludedExtensions: document.querySelector("#defaultExcludedExtensions"),
+  askBackupBeforeApply: document.querySelector("#askBackupBeforeApply"),
+  presetSelect: document.querySelector("#presetSelect"),
+  presetName: document.querySelector("#presetName"),
+  historyEntries: document.querySelector("#historyEntries"),
+  historyEmpty: document.querySelector("#historyEmpty"),
   toast: document.querySelector("#toast")
 };
 
@@ -49,6 +67,10 @@ let currentLanguage = "en";
 let undoLog = null;
 let currentPreview = null;
 let currentPreviewPage = 0;
+let preferences = { ...DEFAULT_PREFERENCES };
+let presets = {};
+let operationHistory = [];
+let restoringHistoryId = null;
 let toastTimer = null;
 
 document.querySelectorAll(".nav-item[data-mode]").forEach((button) => {
@@ -71,7 +93,23 @@ elements.previousPreviewPage.addEventListener("click", () => changePreviewPage(-
 elements.nextPreviewPage.addEventListener("click", () => changePreviewPage(1));
 elements.languageSelect.addEventListener("change", changeLanguage);
 elements.forgetPreferences.addEventListener("change", changePreferencePersistence);
+elements.themeSelect.addEventListener("change", updatePreferencesFromSettings);
+elements.pageSizeSelect.addEventListener("change", updatePreferencesFromSettings);
+elements.defaultExcludedDirs.addEventListener("change", updatePreferencesFromSettings);
+elements.defaultExcludedExtensions.addEventListener("change", updatePreferencesFromSettings);
+elements.askBackupBeforeApply.addEventListener("change", updatePreferencesFromSettings);
+elements.previewSearch.addEventListener("input", () => {
+  currentPreviewPage = 0;
+  if (currentPreview) renderPreview(currentPreview);
+});
+document.querySelector("#savePresetButton").addEventListener("click", savePreset);
+document.querySelector("#loadPresetButton").addEventListener("click", loadPreset);
+document.querySelector("#deletePresetButton").addEventListener("click", deletePreset);
+document.querySelector("#clearHistoryButton").addEventListener("click", clearHistory);
 window.addEventListener("popstate", syncRouteFromLocation);
+window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
+  if (preferences.theme === "system") applyTheme();
+});
 
 initialize();
 
@@ -80,6 +118,7 @@ async function initialize() {
     await loadDictionaries();
     restorePreferences();
     elements.languageSelect.value = currentLanguage;
+    renderSavedData();
     syncRouteFromLocation();
     applyTranslations();
     renderMode();
@@ -96,14 +135,62 @@ function restorePreferences() {
     if (saveEnabled) {
       const savedLanguage = localStorage.getItem("files-editor-language");
       if (SUPPORTED_LANGUAGES.includes(savedLanguage)) currentLanguage = savedLanguage;
+      const savedState = JSON.parse(localStorage.getItem("files-editor-state") || "{}");
+      preferences = validatePreferences(savedState.preferences);
+      presets = savedState.presets && typeof savedState.presets === "object" && !Array.isArray(savedState.presets)
+        ? Object.fromEntries(Object.entries(savedState.presets).filter(([, preset]) =>
+          preset && typeof preset.globalPrefix === "string" && typeof preset.separator === "string" &&
+          Array.isArray(preset.categories) && preset.categoryPrefixes && typeof preset.categoryPrefixes === "object"
+        ))
+        : {};
+      operationHistory = Array.isArray(savedState.history)
+        ? savedState.history.filter((item) =>
+          item && typeof item.id === "string" && ["rename", "extensions", "undo"].includes(item.kind) &&
+          typeof item.folder === "string" && Number.isInteger(item.changed) &&
+          typeof item.timestamp === "string" && item.undoLog && Array.isArray(item.undoLog.renamed_files)
+        ).slice(-HISTORY_LIMIT)
+        : [];
     } else {
       clearSavedPreferences();
+      preferences = { ...DEFAULT_PREFERENCES };
+      presets = {};
+      operationHistory = [];
     }
   } catch (error) {
     elements.forgetPreferences.checked = true;
     currentLanguage = "en";
+    preferences = { ...DEFAULT_PREFERENCES };
+    presets = {};
+    operationHistory = [];
     console.warn("Could not read saved preferences; using the no-save defaults.", error);
+    try {
+      clearSavedPreferences();
+    } catch (clearError) {
+      console.error("Could not clear unreadable saved preferences.", clearError);
+    }
   }
+}
+
+function validatePreferences(saved = {}) {
+  const parsedPageSize = Number(saved.pageSize);
+  return {
+    theme: ["system", "light", "dark", "high_contrast"].includes(saved.theme) ? saved.theme : DEFAULT_PREFERENCES.theme,
+    pageSize: [50, 100, 500].includes(parsedPageSize) ? parsedPageSize : DEFAULT_PREFERENCES.pageSize,
+    excludedDirs: Array.isArray(saved.excludedDirs) ? saved.excludedDirs.filter((item) => typeof item === "string") : [...DEFAULT_PREFERENCES.excludedDirs],
+    excludedExtensions: Array.isArray(saved.excludedExtensions) ? saved.excludedExtensions.filter((item) => typeof item === "string") : [...DEFAULT_PREFERENCES.excludedExtensions],
+    askBackupBeforeApply: typeof saved.askBackupBeforeApply === "boolean" ? saved.askBackupBeforeApply : DEFAULT_PREFERENCES.askBackupBeforeApply
+  };
+}
+
+function renderSavedData() {
+  elements.themeSelect.value = preferences.theme;
+  elements.pageSizeSelect.value = String(preferences.pageSize);
+  elements.defaultExcludedDirs.value = preferences.excludedDirs.join(", ");
+  elements.defaultExcludedExtensions.value = preferences.excludedExtensions.join(", ");
+  elements.askBackupBeforeApply.checked = preferences.askBackupBeforeApply;
+  applyTheme();
+  renderPresets();
+  renderHistory();
 }
 
 function clearSavedPreferences() {
@@ -151,6 +238,8 @@ function applyTranslations() {
   renderPage();
   if (currentPreview && currentPage === "workspace") renderPreview(currentPreview);
   if (undoLog) renderUndoLogStatus();
+  renderPresets();
+  renderHistory();
 }
 
 function changeLanguage() {
@@ -196,10 +285,194 @@ function changePreferencePersistence() {
 function savePreferences() {
   localStorage.setItem("files-editor-save-preferences", "true");
   localStorage.setItem("files-editor-language", currentLanguage);
+  localStorage.setItem("files-editor-state", JSON.stringify({ preferences, presets, history: operationHistory }));
+}
+
+function persistSavedData() {
+  if (elements.forgetPreferences.checked) return;
+  try {
+    savePreferences();
+  } catch (error) {
+    console.error("Could not save Files Editor preferences and local data.", error);
+    elements.forgetPreferences.checked = true;
+    try {
+      clearSavedPreferences();
+    } catch (clearError) {
+      console.error("Could not clear the saved preferences.", clearError);
+    }
+    showToast(translate("messages.preferenceNotSaved"), true, 7000);
+  }
+}
+
+function updatePreferencesFromSettings() {
+  const previous = preferences;
+  preferences = validatePreferences({
+    theme: elements.themeSelect.value,
+    pageSize: elements.pageSizeSelect.value,
+    excludedDirs: parseCommaList(elements.defaultExcludedDirs.value),
+    excludedExtensions: parseCommaList(elements.defaultExcludedExtensions.value),
+    askBackupBeforeApply: elements.askBackupBeforeApply.checked
+  });
+  elements.defaultExcludedDirs.value = preferences.excludedDirs.join(", ");
+  elements.defaultExcludedExtensions.value = preferences.excludedExtensions.join(", ");
+  applyTheme();
+  if (
+    previous.pageSize !== preferences.pageSize ||
+    JSON.stringify(previous.excludedDirs) !== JSON.stringify(preferences.excludedDirs) ||
+    JSON.stringify(previous.excludedExtensions) !== JSON.stringify(preferences.excludedExtensions)
+  ) clearPreview();
+  persistSavedData();
+}
+
+function parseCommaList(value) {
+  return [...new Set(value.split(",").map((item) => item.trim()).filter(Boolean))];
+}
+
+function applyTheme() {
+  const resolvedTheme = preferences.theme === "system"
+    ? (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")
+    : preferences.theme;
+  document.body.dataset.theme = resolvedTheme;
+  document.body.dataset.themeChoice = preferences.theme;
+  const themeColor = resolvedTheme === "dark" ? "#111a20" : "#f5f7fb";
+  document.querySelector('meta[name="theme-color"]').content = themeColor;
+}
+
+function renderPresets() {
+  const selected = elements.presetSelect.value;
+  const placeholder = document.createElement("option");
+  placeholder.value = "";
+  placeholder.textContent = translate("presets.choose");
+  elements.presetSelect.replaceChildren(placeholder);
+  for (const name of Object.keys(presets).sort((left, right) => left.localeCompare(right))) {
+    const option = document.createElement("option");
+    option.value = name;
+    option.textContent = name;
+    elements.presetSelect.append(option);
+  }
+  elements.presetSelect.value = Object.hasOwn(presets, selected) ? selected : "";
+  document.querySelector("#loadPresetButton").disabled = !elements.presetSelect.value;
+  document.querySelector("#deletePresetButton").disabled = !elements.presetSelect.value;
+}
+
+function savePreset() {
+  const name = elements.presetName.value.trim();
+  if (!name || name.length > 80) {
+    showToast(translate("messages.invalidPresetName"), true);
+    return;
+  }
+  presets[name] = readModeOptionsForRename();
+  elements.presetName.value = "";
+  renderPresets();
+  elements.presetSelect.value = name;
+  renderPresets();
+  persistSavedData();
+  showToast(translate("messages.presetSaved", { name }));
+}
+
+function readModeOptionsForRename() {
+  const categories = [...document.querySelectorAll("#categoryFilters input:checked")].map((input) => input.value);
+  const categoryPrefixes = {};
+  document.querySelectorAll("[data-prefix]").forEach((input) => {
+    categoryPrefixes[input.dataset.prefix] = input.value;
+  });
+  return {
+    globalPrefix: document.querySelector("#globalPrefix").value,
+    separator: document.querySelector("#separator").value,
+    padding: document.querySelector("#padding").value,
+    categories,
+    categoryPrefixes
+  };
+}
+
+function loadPreset() {
+  const preset = presets[elements.presetSelect.value];
+  if (!preset) return;
+  document.querySelector("#globalPrefix").value = preset.globalPrefix;
+  document.querySelector("#separator").value = preset.separator;
+  document.querySelector("#padding").value = preset.padding;
+  document.querySelectorAll("#categoryFilters input").forEach((input) => {
+    input.checked = preset.categories.includes(input.value);
+  });
+  document.querySelectorAll("[data-prefix]").forEach((input) => {
+    input.value = preset.categoryPrefixes[input.dataset.prefix] || input.dataset.prefix;
+  });
+  clearPreview();
+  showToast(translate("messages.presetLoaded", { name: elements.presetSelect.value }));
+}
+
+function deletePreset() {
+  const name = elements.presetSelect.value;
+  if (!name || !Object.hasOwn(presets, name)) return;
+  delete presets[name];
+  renderPresets();
+  persistSavedData();
+  showToast(translate("messages.presetDeleted", { name }));
+}
+
+function renderHistory() {
+  elements.historyEntries.replaceChildren();
+  elements.historyEmpty.hidden = operationHistory.length > 0;
+  for (const item of [...operationHistory].reverse()) {
+    const entry = document.createElement("article");
+    entry.className = "history-entry";
+    const detail = document.createElement("div");
+    const title = document.createElement("strong");
+    title.textContent = translate(`history.kind.${item.kind}`, { count: item.changed });
+    const meta = document.createElement("small");
+    meta.textContent = `${item.folder} · ${new Date(item.timestamp).toLocaleString(currentLanguage)}`;
+    meta.title = item.folder;
+    const restore = document.createElement("button");
+    restore.className = "secondary-button";
+    restore.type = "button";
+    restore.textContent = translate("history.restore");
+    restore.addEventListener("click", () => restoreHistoryItem(item));
+    detail.append(title, meta);
+    entry.append(detail, restore);
+    elements.historyEntries.append(entry);
+  }
+}
+
+function recordOperation(result, kind, folder) {
+  if (!result.undoLog || !Array.isArray(result.undoLog.renamed_files)) return;
+  operationHistory.push({
+    id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+    kind,
+    folder,
+    changed: result.changed,
+    timestamp: new Date().toISOString(),
+    undoLog: result.undoLog
+  });
+  operationHistory = operationHistory.slice(-HISTORY_LIMIT);
+  persistSavedData();
+  renderHistory();
+}
+
+async function restoreHistoryItem(item) {
+  undoLog = item.undoLog;
+  restoringHistoryId = item.id;
+  elements.folder.value = item.folder;
+  elements.undoLogName.textContent = translate("history.selected");
+  renderUndoLogStatus();
+  currentMode = "undo";
+  currentPage = "workspace";
+  history.pushState({}, "", "/tools/undo");
+  renderMode();
+  renderPage();
+  await previewChanges();
+}
+
+function clearHistory() {
+  if (!operationHistory.length) return;
+  if (!window.confirm(translate("messages.confirmClearHistory"))) return;
+  operationHistory = [];
+  persistSavedData();
+  renderHistory();
 }
 
 function setMode(mode) {
   if (!["rename", "extensions", "undo"].includes(mode)) return;
+  restoringHistoryId = null;
   currentMode = mode;
   currentPage = "workspace";
   const route = { rename: "/tools/01", extensions: "/tools/02", undo: "/tools/undo" }[mode];
@@ -302,6 +575,8 @@ function clearPreview() {
   elements.previewEmpty.hidden = false;
   elements.previewResults.hidden = true;
   elements.previewRows.replaceChildren();
+  elements.previewSearch.value = "";
+  elements.previewFilterCount.textContent = "";
   elements.previewPagination.hidden = true;
   elements.applyButton.hidden = true;
   elements.previewFooter.classList.remove("ready");
@@ -319,10 +594,8 @@ function readFolderOptions() {
     if (excludedText.toUpperCase() === "TAKE ALL") {
       request.takeAll = true;
     } else {
-      request.excludedDirs = excludedText
-        .split(",")
-        .map((name) => name.trim())
-        .filter(Boolean);
+      request.excludedDirs = [...preferences.excludedDirs, ...parseCommaList(excludedText)];
+      request.excludedExtensions = preferences.excludedExtensions;
     }
   }
   return request;
@@ -330,19 +603,7 @@ function readFolderOptions() {
 
 function readModeOptions() {
   if (currentMode === "rename") {
-    const categories = [...document.querySelectorAll("#categoryFilters input:checked")]
-      .map((input) => input.value);
-    const categoryPrefixes = {};
-    document.querySelectorAll("[data-prefix]").forEach((input) => {
-      categoryPrefixes[input.dataset.prefix] = input.value;
-    });
-    return {
-      globalPrefix: document.querySelector("#globalPrefix").value,
-      separator: document.querySelector("#separator").value,
-      padding: document.querySelector("#padding").value,
-      categories,
-      categoryPrefixes
-    };
+    return readModeOptionsForRename();
   }
   if (currentMode === "extensions") {
     const targets = {};
@@ -366,6 +627,7 @@ async function previewChanges() {
     const response = await apiRequest("/api/preview", request);
     currentPreview = response;
     currentPreviewPage = 0;
+    elements.previewSearch.value = "";
     renderPreview(response);
     if (response.totalFiles === 0) showToast(translate("messages.noChanges"));
   } catch (error) {
@@ -392,10 +654,19 @@ function renderPreview(preview) {
   summaryRight.title = preview.folder;
   elements.previewSummary.append(summaryLeft, summaryRight);
 
-  const pageCount = Math.max(1, Math.ceil(preview.totalFiles / PREVIEW_PAGE_SIZE));
+  const search = elements.previewSearch.value.trim().toLocaleLowerCase();
+  const entries = preview.entries.filter((entry) =>
+    !search || `${entry.old}\n${entry.new}`.toLocaleLowerCase().includes(search)
+  );
+  elements.previewFilterCount.textContent = translate("preview.filterCount", {
+    shown: entries.length,
+    total: preview.totalFiles
+  });
+  const pageSize = preferences.pageSize;
+  const pageCount = Math.max(1, Math.ceil(entries.length / pageSize));
   currentPreviewPage = Math.min(currentPreviewPage, pageCount - 1);
-  const firstEntry = currentPreviewPage * PREVIEW_PAGE_SIZE;
-  const shownEntries = preview.entries.slice(firstEntry, firstEntry + PREVIEW_PAGE_SIZE);
+  const firstEntry = currentPreviewPage * pageSize;
+  const shownEntries = entries.slice(firstEntry, firstEntry + pageSize);
   for (const entry of shownEntries) {
     const row = document.createElement("tr");
     const original = document.createElement("td");
@@ -429,7 +700,11 @@ function renderPreview(preview) {
 
 function changePreviewPage(direction) {
   if (!currentPreview) return;
-  const pageCount = Math.ceil(currentPreview.totalFiles / PREVIEW_PAGE_SIZE);
+  const search = elements.previewSearch.value.trim().toLocaleLowerCase();
+  const filteredCount = currentPreview.entries.filter((entry) =>
+    !search || `${entry.old}\n${entry.new}`.toLocaleLowerCase().includes(search)
+  ).length;
+  const pageCount = Math.ceil(filteredCount / preferences.pageSize);
   const nextPage = currentPreviewPage + direction;
   if (nextPage < 0 || nextPage >= pageCount) return;
   currentPreviewPage = nextPage;
@@ -448,6 +723,17 @@ async function applyChanges() {
   );
   if (!window.confirm(confirmation)) return;
 
+  if (preferences.askBackupBeforeApply) {
+    const backupCheckboxes = isUndo
+      ? ["#undoBackupCopy", "#undoBackupZip"]
+      : ["#backupCopy", "#backupZip"];
+    if (window.confirm(translate("messages.askBackup"))) {
+      backupCheckboxes.forEach((selector) => {
+        document.querySelector(selector).checked = true;
+      });
+    }
+  }
+
   setBusy(elements.applyButton, true, "actions.applying");
   try {
     const backups = currentMode === "undo"
@@ -465,6 +751,10 @@ async function applyChanges() {
       previewId: currentPreview.previewId,
       backups
     });
+    if (restoringHistoryId) {
+      operationHistory = operationHistory.filter((item) => item.id !== restoringHistoryId);
+    }
+    recordOperation(result, currentMode, currentPreview.folder);
     const successKey = currentMode === "undo" ? "messages.fileRestored" : "messages.fileUpdated";
     const pluralKey = currentMode === "undo" ? "messages.filesRestored" : "messages.filesUpdated";
     const successMessage = translate(result.changed === 1 ? successKey : pluralKey, {
@@ -476,6 +766,7 @@ async function applyChanges() {
     const logMessage = result.log ? translate("messages.undoLogLocation", { path: result.log }) : "";
     showToast(`${successMessage}${backupMessage}${logMessage}`, false, 9000);
     clearPreview();
+    restoringHistoryId = null;
   } catch (error) {
     showToast(error.message, true, 8000);
   } finally {
@@ -568,6 +859,7 @@ function translateServerError(message) {
     "Backup options must be enabled or disabled.": "errors.backupOptionsBoolean",
     "Subfolder scanning must be enabled or disabled.": "errors.invalidRecursive",
     "Excluded folders must be a list of folder names.": "errors.excludedList",
+    "Excluded extensions must be a list of file extensions.": "errors.excludedExtensionsList",
     "The prefix and separator must be text.": "errors.prefixAndSeparatorText",
     "Category prefixes must be an object.": "errors.categoryPrefixesObject",
     "Choose one or more valid categories.": "errors.validCategories",

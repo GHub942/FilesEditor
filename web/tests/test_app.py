@@ -1,11 +1,14 @@
 import threading
+import sys
 import unittest
 from http.client import HTTPConnection
 from http.server import ThreadingHTTPServer
 from urllib.error import HTTPError
 from urllib.request import urlopen
+from pathlib import Path
 
-from WEB.app import FilesEditorHandler
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from app import FilesEditorHandler
 
 
 class WebRouteTests(unittest.TestCase):

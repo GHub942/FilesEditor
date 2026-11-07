@@ -13,6 +13,7 @@ DEFAULT_EXCLUDED_DIRS = {
     ".venv", "venv", "env", ".env", "temp", "tmp", ".temp", ".tmp",
     "node_modules", ".git", "__pycache__", ".idea", ".vscode",
 }
+DEFAULT_EXCLUDED_EXTENSIONS = {".tmp", ".bak"}
 
 CATEGORY_EXTENSIONS = {
     "IMG": {".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp", ".svg", ".tiff", ".raw", ".heic"},
@@ -56,7 +57,8 @@ def _resolve_root(raw_path):
     return root
 
 
-def _collect_files(root, recursive, excluded_dirs):
+def _collect_files(root, recursive, excluded_dirs, excluded_extensions=None):
+    excluded_extensions = excluded_extensions or set()
     files = []
     if recursive:
         def raise_walk_error(error):
@@ -67,10 +69,14 @@ def _collect_files(root, recursive, excluded_dirs):
             for name in names:
                 path = Path(current) / name
                 if not path.is_symlink():
-                    files.append(path)
+                    if path.suffix.lower() not in excluded_extensions:
+                        files.append(path)
     else:
         try:
-            files.extend(item for item in root.iterdir() if item.is_file() and not item.is_symlink())
+            files.extend(
+                item for item in root.iterdir()
+                if item.is_file() and not item.is_symlink() and item.suffix.lower() not in excluded_extensions
+            )
         except OSError as error:
             raise OperationError(f"Could not list the selected folder: {error}") from error
     return sorted(files, key=lambda path: (str(path.parent).casefold(), path.name.casefold()))
@@ -221,12 +227,22 @@ def create_preview(kind, options):
             raise OperationError("Subfolder scanning must be enabled or disabled.")
         if options.get("takeAll"):
             excluded = set()
+            excluded_extensions = set()
         else:
             custom_excluded = options.get("excludedDirs", [])
             if not isinstance(custom_excluded, list) or any(not isinstance(item, str) for item in custom_excluded):
                 raise OperationError("Excluded folders must be a list of folder names.")
-            excluded = DEFAULT_EXCLUDED_DIRS | {item.strip() for item in custom_excluded if item.strip()}
-        files = _collect_files(root, recursive, excluded)
+            custom_directories = {item.strip() for item in custom_excluded if item.strip()}
+            excluded = custom_directories if "excludedDirs" in options else DEFAULT_EXCLUDED_DIRS | custom_directories
+            custom_extensions = options.get("excludedExtensions", [])
+            if not isinstance(custom_extensions, list) or any(not isinstance(item, str) for item in custom_extensions):
+                raise OperationError("Excluded extensions must be a list of file extensions.")
+            parsed_extensions = {
+                item.strip().lower() if item.strip().startswith(".") else f".{item.strip().lower()}"
+                for item in custom_extensions if item.strip()
+            }
+            excluded_extensions = parsed_extensions if "excludedExtensions" in options else DEFAULT_EXCLUDED_EXTENSIONS | parsed_extensions
+        files = _collect_files(root, recursive, excluded, excluded_extensions)
     if kind == "rename":
         planned, details = _plan_rename(root, files, options)
     elif kind == "extensions":
@@ -369,4 +385,5 @@ def apply_preview(preview, backup_options):
         "changed": len(preview.entries),
         "backups": backups,
         "log": str(log_path) if log_path else None,
+        "undoLog": preview.log_data,
     }

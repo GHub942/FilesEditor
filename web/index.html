@@ -165,6 +165,20 @@
                 <label><span>DOC</span><input type="text" data-prefix="DOC" value="DOC" aria-label="Document prefix" data-i18n-aria-label="rename.prefixAria.DOC"></label>
               </div>
             </details>
+            <div class="preset-controls">
+              <label class="field-label" for="presetSelect" data-i18n="presets.label">RENAMING PRESETS</label>
+              <div class="preset-row">
+                <select id="presetSelect" class="language-select" aria-label="Renaming presets" data-i18n-aria-label="presets.label">
+                  <option value="" data-i18n="presets.choose">Choose a preset</option>
+                </select>
+                <button id="loadPresetButton" class="secondary-button" type="button" data-i18n="presets.load">Load</button>
+                <button id="deletePresetButton" class="secondary-button" type="button" data-i18n="presets.delete">Delete</button>
+              </div>
+              <div class="preset-row">
+                <input id="presetName" type="text" placeholder="Preset name" data-i18n-placeholder="presets.namePlaceholder" aria-label="Preset name" data-i18n-aria-label="presets.nameLabel">
+                <button id="savePresetButton" class="secondary-button" type="button" data-i18n="presets.save">Save current settings</button>
+              </div>
+            </div>
           </div>
 
           <div class="panel options-panel" id="extensionOptions" hidden>
@@ -241,6 +255,11 @@
             </div>
             <div class="preview-results" id="previewResults" hidden>
               <div class="preview-summary" id="previewSummary"></div>
+              <div class="preview-filter">
+                <label class="field-label" for="previewSearch" data-i18n="preview.searchLabel">FILTER PREVIEW</label>
+                <input id="previewSearch" type="search" placeholder="Search original or new names" data-i18n-placeholder="preview.searchPlaceholder">
+                <span id="previewFilterCount" class="field-hint" aria-live="polite"></span>
+              </div>
               <div class="preview-table-wrap">
                 <table>
                   <thead><tr><th data-i18n="preview.originalName">ORIGINAL NAME</th><th aria-label="Change" data-i18n-aria-label="preview.change"></th><th data-i18n="preview.newName">NEW NAME</th></tr></thead>
@@ -261,6 +280,14 @@
             <div class="workflow-step"><span>2</span><p><strong data-i18n="workflow.stepReview">Review</strong><small data-i18n="workflow.stepReviewHelp">Check every proposed filename before continuing.</small></p></div>
             <div class="workflow-step"><span>3</span><p><strong data-i18n="workflow.stepApply">Apply</strong><small data-i18n="workflow.stepApplyHelp">Confirm to make the changes on your device.</small></p></div>
           </div>
+          <section class="history-card" aria-labelledby="historyTitle">
+            <div class="history-heading">
+              <div><div class="eyebrow"><span class="eyebrow-line"></span><span data-i18n="history.eyebrow">RECENT ACTIVITY</span></div><h2 id="historyTitle" data-i18n="history.title">Operation history</h2></div>
+              <button id="clearHistoryButton" class="secondary-button" type="button" data-i18n="history.clear">Clear</button>
+            </div>
+            <p id="historyEmpty" class="field-hint" data-i18n="history.empty">Completed operations will appear here.</p>
+            <div id="historyEntries" class="history-entries"></div>
+          </section>
         </aside>
       </div>
 
@@ -287,6 +314,32 @@
             <option value="fr">Français</option>
           </select>
           <p class="field-hint" data-i18n="settings.languageHelp">Choose whether to remember your interface language in this browser.</p>
+        </div>
+        <div class="panel settings-panel settings-preferences">
+          <h3 data-i18n="settings.appearanceTitle">Appearance and review</h3>
+          <label class="field-label" for="themeSelect" data-i18n="settings.themeLabel">THEME</label>
+          <select id="themeSelect" class="language-select">
+            <option value="system" data-i18n="settings.themeSystem">Use system setting</option>
+            <option value="light" data-i18n="settings.themeLight">Light</option>
+            <option value="dark" data-i18n="settings.themeDark">Dark</option>
+            <option value="high_contrast" data-i18n="settings.themeContrast">High contrast</option>
+          </select>
+          <label class="field-label" for="pageSizeSelect" data-i18n="settings.pageSizeLabel">PREVIEW ROWS PER PAGE</label>
+          <select id="pageSizeSelect" class="language-select">
+            <option value="50">50</option>
+            <option value="100">100</option>
+            <option value="500">500</option>
+          </select>
+          <label class="field-label" for="defaultExcludedDirs" data-i18n="settings.excludedDirsLabel">DEFAULT EXCLUDED FOLDERS</label>
+          <input id="defaultExcludedDirs" type="text" data-i18n-placeholder="settings.excludedDirsPlaceholder">
+          <label class="field-label" for="defaultExcludedExtensions" data-i18n="settings.excludedExtensionsLabel">DEFAULT EXCLUDED EXTENSIONS</label>
+          <input id="defaultExcludedExtensions" type="text" data-i18n-placeholder="settings.excludedExtensionsPlaceholder">
+          <p class="field-hint" data-i18n="settings.exclusionsHelp">Separate names and extensions with commas. Extensions may include the leading dot.</p>
+          <label class="preference-toggle panel">
+            <input id="askBackupBeforeApply" type="checkbox">
+            <span class="custom-check" aria-hidden="true"></span>
+            <span><strong data-i18n="settings.askBackupTitle">Ask before each application</strong><small data-i18n="settings.askBackupDescription">Offer a full-copy and ZIP backup before changing files.</small></span>
+          </label>
         </div>
         <label class="preference-toggle panel">
           <input id="forgetPreferences" type="checkbox" checked>

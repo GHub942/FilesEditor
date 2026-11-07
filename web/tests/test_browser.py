@@ -1,12 +1,15 @@
 import os
+import sys
 import threading
+import tempfile
 import unittest
 from http.server import ThreadingHTTPServer
 from pathlib import Path
 
 from playwright.sync_api import expect, sync_playwright
 
-from WEB.app import FilesEditorHandler
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from app import FilesEditorHandler
 
 
 class BrowserVisualTests(unittest.TestCase):
@@ -103,3 +106,96 @@ class BrowserVisualTests(unittest.TestCase):
         )
         self.assertTrue(self.page.locator("#pageHeading").is_visible())
         self.save_screenshot("mobile-extension-editor.png")
+
+    def test_preview_filter_page_size_and_ephemeral_presets(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            for index in range(63):
+                Path(temporary, f"sample-{index:03}.txt").write_text("sample", encoding="utf-8")
+            Path(temporary, "skip.bak").write_text("ignored by default", encoding="utf-8")
+            Path(temporary, "skip.skip").write_text("ignored by preference", encoding="utf-8")
+            nested = Path(temporary, "ignored-nested")
+            nested.mkdir()
+            (nested / "nested.txt").write_text("ignored by preference", encoding="utf-8")
+
+            self.page.goto(f"{self.base_url}/tools/01")
+            self.page.wait_for_load_state("networkidle")
+            self.page.locator('[data-page="settings"]').click()
+            self.page.locator("#defaultExcludedExtensions").fill(".tmp, .bak, .skip")
+            excluded_dirs = self.page.locator("#defaultExcludedDirs")
+            excluded_dirs.fill(f"{excluded_dirs.input_value()}, ignored-nested")
+            self.page.locator("#closeSettingsButton").click()
+            self.page.locator("#folderPath").fill(temporary)
+            self.page.locator("#globalPrefix").fill("batch")
+            self.page.locator(".switch-row").click()
+            expect(self.page.locator("#recursive")).to_be_checked()
+            self.page.locator("#previewButton").click()
+            expect(self.page.locator("#previewRows tr")).to_have_count(50)
+            expect(self.page.locator("#previewPageIndicator")).to_have_text("Page 1 of 2")
+
+            self.page.locator("#previewSearch").fill("sample-062.txt")
+            expect(self.page.locator("#previewRows tr")).to_have_count(1)
+            expect(self.page.locator("#previewFilterCount")).to_have_text("1 of 63 changes shown")
+
+            self.page.locator("#presetName").fill("Work batch")
+            self.page.locator("#savePresetButton").click()
+            expect(self.page.locator("#presetSelect")).to_have_value("Work batch")
+            self.assertEqual(self.page.evaluate("localStorage.length"), 0)
+            self.page.reload()
+            self.page.wait_for_load_state("networkidle")
+            self.assertEqual(self.page.locator("#presetSelect option").count(), 1)
+
+            self.page.locator('[data-page="settings"]').click()
+            self.page.locator("#pageSizeSelect").select_option("100")
+            self.page.locator("#themeSelect").select_option("dark")
+            self.page.locator("#defaultExcludedExtensions").fill(".tmp, .bak, .skip")
+            self.assertEqual(self.page.locator("body").get_attribute("data-theme"), "dark")
+            self.page.locator("#forgetPreferences").uncheck()
+            self.page.locator("#closeSettingsButton").click()
+            self.page.locator("#presetName").fill("Remember this")
+            self.page.locator("#savePresetButton").click()
+            self.page.reload()
+            self.page.wait_for_load_state("networkidle")
+            expect(self.page.locator("#presetSelect option")).to_have_count(2)
+            expect(self.page.locator("#pageSizeSelect")).to_have_value("100")
+            expect(self.page.locator("#themeSelect")).to_have_value("dark")
+            expect(self.page.locator("#forgetPreferences")).not_to_be_checked()
+            self.page.locator("#folderPath").fill(temporary)
+            self.page.locator("#previewButton").click()
+            expect(self.page.locator("#previewRows tr")).to_have_count(63)
+            expect(self.page.locator("#previewPagination")).to_be_hidden()
+
+    def test_operation_history_restores_files_through_preview(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            original = Path(temporary, "photo.jpg")
+            original.write_text("photo", encoding="utf-8")
+            self.page.goto(f"{self.base_url}/tools/01")
+            self.page.wait_for_load_state("networkidle")
+            dialogs = []
+
+            def handle_dialog(dialog):
+                dialogs.append(dialog.message)
+                if "full-copy and ZIP" in dialog.message:
+                    dialog.dismiss()
+                else:
+                    dialog.accept()
+
+            self.page.on("dialog", handle_dialog)
+            self.page.locator("#folderPath").fill(temporary)
+            self.page.locator("#globalPrefix").fill("batch")
+            self.page.locator("#backupLog").uncheck()
+            self.page.locator("#previewButton").click()
+            expect(self.page.locator("#previewRows tr")).to_have_count(1)
+            self.page.locator("#applyButton").click()
+            renamed = Path(temporary, "batch__IMG_001.jpg")
+            expect(self.page.locator("#toast")).to_contain_text("updated")
+            self.assertTrue(renamed.exists())
+            expect(self.page.locator(".history-entry")).to_have_count(1)
+
+            self.page.locator(".history-entry .secondary-button").click()
+            expect(self.page.locator("#previewRows tr")).to_have_count(1)
+            self.page.locator("#applyButton").click()
+            expect(self.page.locator("#toast")).to_contain_text("restored")
+            self.assertTrue(original.exists())
+            self.assertFalse(renamed.exists())
+            expect(self.page.locator(".history-entry")).to_have_count(1)
+            self.assertEqual(sum("full-copy and ZIP" in message for message in dialogs), 2)

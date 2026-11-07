@@ -1,8 +1,10 @@
 import tempfile
+import sys
 import unittest
 from pathlib import Path
 
-from WEB.file_operations import OperationError, apply_preview, create_preview
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from file_operations import OperationError, apply_preview, create_preview
 
 
 class FileOperationTests(unittest.TestCase):
@@ -24,7 +26,9 @@ class FileOperationTests(unittest.TestCase):
             self.assertEqual(preview.entries[0]["old"].name, "small.jpg")
             self.assertEqual(preview.entries[0]["new"].name, "Photos__IMG_01.jpg")
 
-            apply_preview(preview, {})
+            result = apply_preview(preview, {})
+            self.assertEqual(result["changed"], 2)
+            self.assertEqual(len(result["undoLog"]["renamed_files"]), 2)
             renamed_path = root / "Photos__IMG_01.jpg"
             self.assertEqual(renamed_path.read_bytes(), b"x")
 
@@ -68,11 +72,44 @@ class FileOperationTests(unittest.TestCase):
                 "globalPrefix": "batch",
                 "separator": "__",
                 "padding": 1,
-                "categories": ["DOC"],
+                "categories": ["DOC", "FILE"],
                 "categoryPrefixes": {},
             })
             self.assertEqual(len(preview.entries), 1)
             self.assertEqual(preview.entries[0]["old"].relative_to(root).as_posix(), "nested/inside.txt")
+
+    def test_default_and_user_excluded_extensions_are_ignored(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            (root / "keep.txt").write_text("keep", encoding="utf-8")
+            (root / "default.tmp").write_text("temporary", encoding="utf-8")
+            (root / "backup.bak").write_text("backup", encoding="utf-8")
+            (root / "custom.skip").write_text("custom", encoding="utf-8")
+
+            default_preview = create_preview("rename", {
+                "folder": str(root),
+                "globalPrefix": "batch",
+                "separator": "__",
+                "padding": 1,
+                "categories": ["DOC", "FILE"],
+                "categoryPrefixes": {},
+            })
+            self.assertEqual(
+                [entry["old"].name for entry in default_preview.entries],
+                ["custom.skip", "keep.txt"],
+            )
+
+            preview = create_preview("rename", {
+                "folder": str(root),
+                "excludedExtensions": [".tmp", ".bak", ".skip"],
+                "globalPrefix": "batch",
+                "separator": "__",
+                "padding": 1,
+                "categories": ["DOC"],
+                "categoryPrefixes": {},
+            })
+
+            self.assertEqual([entry["old"].name for entry in preview.entries], ["keep.txt"])
 
     def test_apply_refuses_to_overwrite_destination_created_after_preview(self):
         with tempfile.TemporaryDirectory() as temporary:

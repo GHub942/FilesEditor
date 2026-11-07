@@ -175,7 +175,32 @@
     "pagination": "Pages de l’aperçu",
     "previousPage": "Page précédente",
     "nextPage": "Page suivante",
-    "pageIndicator": "Page {current} sur {total}"
+    "pageIndicator": "Page {current} sur {total}",
+    "searchLabel": "FILTRER L’APERÇU",
+    "searchPlaceholder": "Rechercher un nom d’origine ou nouveau",
+    "filterCount": "{shown} sur {total} changements affichés"
+  },
+  "presets": {
+    "label": "PRÉRÉGLAGES DE RENOMMAGE",
+    "choose": "Choisir un préréglage",
+    "load": "Charger",
+    "delete": "Supprimer",
+    "namePlaceholder": "Nom du préréglage",
+    "nameLabel": "Nom du préréglage",
+    "save": "Enregistrer les paramètres actuels"
+  },
+  "history": {
+    "eyebrow": "ACTIVITÉ RÉCENTE",
+    "title": "Historique des opérations",
+    "empty": "Les opérations terminées apparaîtront ici.",
+    "clear": "Effacer",
+    "restore": "Restaurer",
+    "selected": "Sélectionné dans l’historique des opérations",
+    "kind": {
+      "rename": "{count} fichiers renommés",
+      "extensions": "{count} extensions modifiées",
+      "undo": "{count} fichiers restaurés"
+    }
   },
   "actions": {
     "previewChanges": "Prévisualiser les changements",
@@ -192,6 +217,20 @@
     "languageDescription": "Choisissez la langue utilisée dans Files Editor.",
     "languageLabel": "LANGUE DE L’INTERFACE",
     "languageHelp": "Choisissez si la langue de l’interface doit être mémorisée dans ce navigateur.",
+    "appearanceTitle": "Affichage et aperçu",
+    "themeLabel": "THÈME",
+    "themeSystem": "Suivre les paramètres du système",
+    "themeLight": "Clair",
+    "themeDark": "Sombre",
+    "themeContrast": "Contraste renforcé",
+    "pageSizeLabel": "LIGNES PAR PAGE D’APERÇU",
+    "excludedDirsLabel": "DOSSIERS EXCLUS PAR DÉFAUT",
+    "excludedDirsPlaceholder": "node_modules, .git, __pycache__",
+    "excludedExtensionsLabel": "EXTENSIONS EXCLUES PAR DÉFAUT",
+    "excludedExtensionsPlaceholder": ".tmp, .bak",
+    "exclusionsHelp": "Séparez les noms et extensions par des virgules. Le point initial d’une extension est facultatif.",
+    "askBackupTitle": "Demander avant chaque application",
+    "askBackupDescription": "Proposer une copie complète et une archive ZIP avant de modifier les fichiers.",
     "forgetTitle": "Ne pas enregistrer les préférences",
     "forgetDescription": "Si cette option est activée, rien n’est mémorisé et F5 réinitialise la langue en anglais.",
     "localTitle": "Traitement local",
@@ -218,6 +257,12 @@
     "requestFailed": "Échec de la requête ({status}).",
     "serverUnavailable": "Impossible de joindre le serveur local. Vérifiez que Files Editor est toujours en cours d’exécution.",
     "preferenceNotSaved": "La langue a changé, mais ce navigateur n’a pas pu enregistrer votre préférence.",
+    "invalidPresetName": "Saisissez un nom de préréglage de 1 à 80 caractères.",
+    "presetSaved": "Préréglage enregistré : {name}.",
+    "presetLoaded": "Préréglage chargé : {name}.",
+    "presetDeleted": "Préréglage supprimé : {name}.",
+    "confirmClearHistory": "Effacer tout l’historique des opérations de cette session ?",
+    "askBackup": "Voulez-vous créer une copie complète et une archive ZIP avant l’application ? Si vous choisissez Non, les options de sauvegarde actuelles sont conservées.",
     "unknownError": "Une erreur est survenue."
   },
   "errors": {
@@ -241,6 +286,7 @@
     "backupOptionsBoolean": "Les options de sauvegarde doivent être activées ou désactivées.",
     "invalidRecursive": "L’analyse des sous-dossiers doit être activée ou désactivée.",
     "excludedList": "Les dossiers exclus doivent être indiqués sous forme de liste de noms.",
+    "excludedExtensionsList": "Les extensions exclues doivent être indiquées sous forme de liste.",
     "prefixAndSeparatorText": "Le préfixe et le séparateur doivent être du texte.",
     "categoryPrefixesObject": "Les préfixes des catégories doivent être un objet.",
     "validCategories": "Choisissez au moins une catégorie valide.",

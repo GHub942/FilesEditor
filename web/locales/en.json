@@ -175,7 +175,32 @@
     "pagination": "Preview pages",
     "previousPage": "Previous page",
     "nextPage": "Next page",
-    "pageIndicator": "Page {current} of {total}"
+    "pageIndicator": "Page {current} of {total}",
+    "searchLabel": "FILTER PREVIEW",
+    "searchPlaceholder": "Search original or new names",
+    "filterCount": "{shown} of {total} changes shown"
+  },
+  "presets": {
+    "label": "RENAMING PRESETS",
+    "choose": "Choose a preset",
+    "load": "Load",
+    "delete": "Delete",
+    "namePlaceholder": "Preset name",
+    "nameLabel": "Preset name",
+    "save": "Save current settings"
+  },
+  "history": {
+    "eyebrow": "RECENT ACTIVITY",
+    "title": "Operation history",
+    "empty": "Completed operations will appear here.",
+    "clear": "Clear",
+    "restore": "Restore",
+    "selected": "Selected from operation history",
+    "kind": {
+      "rename": "Renamed {count} files",
+      "extensions": "Changed {count} extensions",
+      "undo": "Restored {count} files"
+    }
   },
   "actions": {
     "previewChanges": "Preview changes",
@@ -192,6 +217,20 @@
     "languageDescription": "Choose the language used across Files Editor.",
     "languageLabel": "INTERFACE LANGUAGE",
     "languageHelp": "Choose whether to remember your interface language in this browser.",
+    "appearanceTitle": "Appearance and review",
+    "themeLabel": "THEME",
+    "themeSystem": "Use system setting",
+    "themeLight": "Light",
+    "themeDark": "Dark",
+    "themeContrast": "High contrast",
+    "pageSizeLabel": "PREVIEW ROWS PER PAGE",
+    "excludedDirsLabel": "DEFAULT EXCLUDED FOLDERS",
+    "excludedDirsPlaceholder": "node_modules, .git, __pycache__",
+    "excludedExtensionsLabel": "DEFAULT EXCLUDED EXTENSIONS",
+    "excludedExtensionsPlaceholder": ".tmp, .bak",
+    "exclusionsHelp": "Separate names and extensions with commas. Extensions may include the leading dot.",
+    "askBackupTitle": "Ask before each application",
+    "askBackupDescription": "Offer a full-copy and ZIP backup before changing files.",
     "forgetTitle": "Do not save preferences",
     "forgetDescription": "When enabled, preferences are not stored and reloading resets the language to English.",
     "localTitle": "Local processing",
@@ -218,6 +257,12 @@
     "requestFailed": "Request failed ({status}).",
     "serverUnavailable": "Could not connect to the local server. Check that Files Editor is still running.",
     "preferenceNotSaved": "The language changed, but this browser could not save your preference.",
+    "invalidPresetName": "Enter a preset name of 1 to 80 characters.",
+    "presetSaved": "Preset saved: {name}.",
+    "presetLoaded": "Preset loaded: {name}.",
+    "presetDeleted": "Preset deleted: {name}.",
+    "confirmClearHistory": "Clear all operation history from this session?",
+    "askBackup": "Would you like to create a full-copy and ZIP backup before applying? Choosing No keeps the current backup selections.",
     "unknownError": "Something went wrong."
   },
   "errors": {
@@ -241,6 +286,7 @@
     "backupOptionsBoolean": "Backup options must be enabled or disabled.",
     "invalidRecursive": "Subfolder scanning must be enabled or disabled.",
     "excludedList": "Excluded folders must be a list of folder names.",
+    "excludedExtensionsList": "Excluded extensions must be a list of file extensions.",
     "prefixAndSeparatorText": "The prefix and separator must be text.",
     "categoryPrefixesObject": "Category prefixes must be an object.",
     "validCategories": "Choose one or more valid categories.",

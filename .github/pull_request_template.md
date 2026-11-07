@@ -4,7 +4,7 @@
 
 ## Validation
 
-- [ ] `python -m unittest discover -s WEB\tests -v`
+- [ ] `python -m unittest discover -s web\tests -v`
 - [ ] Browser UI checked in English and French when applicable
 
 ## File-operation safety

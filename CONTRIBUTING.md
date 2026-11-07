@@ -12,7 +12,7 @@
 Run the focused web tests from the project root:
 
 ```powershell
-python -m unittest discover -s WEB\tests -v
+python -m unittest discover -s web\tests -v
 ```
 
 The test command includes desktop/mobile Chromium checks and saves diagnostic screenshots under `web-test-artifacts/`.
@@ -20,13 +20,13 @@ The test command includes desktop/mobile Chromium checks and saves diagnostic sc
 Check browser JavaScript syntax with:
 
 ```powershell
-node --check WEB\app.js
+node --check web\app.js
 ```
 
 ## Web interface changes
 
-- Keep all user-visible strings in both `WEB\locales\en.json` and `WEB\locales\fr.json`.
-- Use translation keys in `WEB\index.html` and `WEB\app.js`; do not add hard-coded interface copy.
+- Keep all user-visible strings in both `web\locales\en.json` and `web\locales\fr.json`.
+- Use translation keys in `web\index.html` and `web\app.js`; do not add hard-coded interface copy.
 - Preserve local-only operation, preview-before-apply, and collision checks.
 - Add or update tests when changing file-operation behavior.
 
