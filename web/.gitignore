@@ -1,0 +1,13 @@
+*
+!*/
+!.gitignore
+!*.md
+!*.py
+!*.html
+!*.css
+!*.js
+
+__pycache__/
+*.py[cod]
+node_modules/
+.agents/
