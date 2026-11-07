@@ -50,6 +50,8 @@ Run the web file-operation tests from the project root:
 python -m unittest discover -s WEB\tests -v
 ```
 
+The workflow also runs Chromium browser checks for desktop/mobile layouts, active navigation, keyboard focus, and icon-button tooltips. To run these checks locally, install the test-only dependency with `python -m pip install -r requirements-test.txt` and install Chromium with `python -m playwright install chromium`.
+
 ## Safety
 
 Use the web app locally only; it is not intended for public network deployment. Review each preview and keep a backup of important files before applying changes.

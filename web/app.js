@@ -144,6 +144,9 @@ function applyTranslations() {
   document.querySelectorAll("[data-i18n-aria-label]").forEach((element) => {
     element.setAttribute("aria-label", translate(element.dataset.i18nAriaLabel));
   });
+  document.querySelectorAll("[data-i18n-title]").forEach((element) => {
+    element.title = translate(element.dataset.i18nTitle);
+  });
   renderMode();
   renderPage();
   if (currentPreview && currentPage === "workspace") renderPreview(currentPreview);
@@ -213,6 +216,7 @@ function openSettingsDialog() {
     history.pushState({}, "", `${url.pathname}${url.search}${url.hash}`);
   }
   if (!elements.settingsDialog.open) elements.settingsDialog.showModal();
+  renderPage();
 }
 
 function closeSettingsDialog() {
@@ -225,6 +229,7 @@ function removeSettingsQuery() {
   if (url.searchParams.get("settings") !== "true") return;
   url.searchParams.delete("settings");
   history.replaceState(history.state, "", `${url.pathname}${url.search}${url.hash}`);
+  renderPage();
 }
 
 function syncRouteFromLocation() {
@@ -282,8 +287,12 @@ function renderPage() {
       : translate("app.title");
   elements.breadcrumbTitle.textContent = translate(navigationKey);
   const settingsButton = document.querySelector('[data-page="settings"]');
-  settingsButton.classList.remove("active");
-  settingsButton.setAttribute("aria-current", "false");
+  const homeButton = document.querySelector('.sidebar-quick-nav a[href="/home"]');
+  const settingsOpen = new URL(window.location.href).searchParams.get("settings") === "true";
+  homeButton.classList.toggle("active", landing);
+  homeButton.setAttribute("aria-current", landing ? "page" : "false");
+  settingsButton.classList.toggle("active", settingsOpen);
+  settingsButton.setAttribute("aria-pressed", String(settingsOpen));
 }
 
 function clearPreview() {

@@ -42,6 +42,9 @@ class WebRouteTests(unittest.TestCase):
         self.assertLess(home_position, settings_position)
         self.assertLess(settings_position, tools_position)
         self.assertIn('data-i18n-aria-label="app.home"', body[home_position:settings_position])
+        self.assertIn('data-i18n-title="app.home"', body[home_position:settings_position])
+        self.assertIn('data-i18n-title="navigation.settings"', body[settings_position:tools_position])
+        self.assertIn('aria-pressed="false"', body[settings_position:tools_position])
 
     def test_root_redirect_preserves_settings_query(self):
         response = urlopen(f"{self.base_url}/?settings=true")

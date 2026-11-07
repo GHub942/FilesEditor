@@ -59,9 +59,9 @@ button { cursor: pointer; }
 .brand-copy strong { font: 700 15px var(--display); letter-spacing: -.3px; }
 .brand-copy small { color: #789099; font: 500 9px var(--mono); letter-spacing: 1.3px; }
 
-.sidebar-quick-nav { display: flex; gap: 8px; margin: 0 0 31px; padding-left: 5px; }
-.icon-nav-button { display: grid; width: 36px; height: 36px; place-items: center; border: 1px solid #314750; border-radius: 8px; background: #1c333d; color: #a7b7bd; cursor: pointer; transition: background .18s ease, color .18s ease, border-color .18s ease; }
-.icon-nav-button:hover, .icon-nav-button:focus-visible { border-color: #42645f; background: #23423f; color: #7fe0bf; }
+.sidebar-quick-nav { display: flex; width: 100%; gap: 8px; margin: 0 0 31px; }
+.icon-nav-button { display: grid; flex: 1 1 0; width: 0; min-width: 0; height: 42px; padding: 0; place-items: center; border: 1px solid #314750; border-radius: 8px; background: #1c333d; color: #a7b7bd; cursor: pointer; transition: background .18s ease, color .18s ease, border-color .18s ease; }
+.icon-nav-button:hover, .icon-nav-button:focus-visible, .icon-nav-button.active { border-color: #42645f; background: #23423f; color: #7fe0bf; }
 .icon-nav-button svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.6; }
 .icon-nav-button:focus-visible { outline: 2px solid #70d5bb; outline-offset: 2px; }
 
@@ -82,7 +82,8 @@ button { cursor: pointer; }
   text-decoration: none;
   transition: background .18s ease, color .18s ease;
 }
-.nav-item:hover { background: #203843; color: #fff; }
+.nav-item:hover, .nav-item:focus-visible { background: #203843; color: #fff; }
+.nav-item:focus-visible { outline: 2px solid #70d5bb; outline-offset: 2px; }
 .nav-item.active { border-color: #315451; background: #23423f; color: #f7fffc; }
 .nav-icon { display: grid; width: 26px; height: 25px; place-items: center; border-radius: 6px; background: #223b45; color: #a1b5b9; font: 500 9px var(--mono); }
 .nav-item.active .nav-icon { background: #2c5c53; color: #7fe0bf; }
@@ -340,7 +341,7 @@ td.new-name { color: #2d8476; }
   .sidebar { position: static; width: auto; height: auto; padding: 12px 14px 10px; }
   .brand { margin: 0; }
   .sidebar-quick-nav { position: absolute; top: 13px; right: 14px; gap: 5px; margin: 0; padding: 0; }
-  .icon-nav-button { width: 32px; height: 32px; }
+  .icon-nav-button { height: 32px; }
   .sidebar-label, .sidebar-spacer, .local-card, .sidebar-footer { display: none; }
   .tool-nav { grid-template-columns: repeat(3, 1fr); gap: 5px; margin-top: 11px; }
   .nav-item { justify-content: center; gap: 6px; min-height: 37px; padding: 0 5px; font-size: 10px; }

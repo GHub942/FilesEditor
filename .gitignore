@@ -28,6 +28,7 @@
 !*.bat
 !*.cmd
 !*.sql
+!requirements*.txt
 
 # Assets.
 !*.svg
@@ -59,6 +60,7 @@ __pycache__/
 *.pyc
 *.pyo
 .test/
+web-test-artifacts/
 data/
 scratch/
 node_modules/

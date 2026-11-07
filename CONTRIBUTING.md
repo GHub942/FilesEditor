@@ -4,6 +4,7 @@
 
 - Python 3.10 or later is required for the web server and tests.
 - The web version uses only the Python standard library.
+- Chromium browser checks require `python -m pip install -r requirements-test.txt` and `python -m playwright install chromium`.
 - Node.js is optional and can be used to check the browser script syntax.
 
 ## Validation
@@ -13,6 +14,8 @@ Run the focused web tests from the project root:
 ```powershell
 python -m unittest discover -s WEB\tests -v
 ```
+
+The test command includes desktop/mobile Chromium checks and saves diagnostic screenshots under `web-test-artifacts/`.
 
 Check browser JavaScript syntax with:
 
