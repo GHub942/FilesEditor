@@ -17,9 +17,11 @@ From the project directory, start the local web app:
 python .\WEB\app.py
 ```
 
-Open `http://127.0.0.1:8765`. The server binds to the local computer only; keep the terminal window open while using it and press `Ctrl+C` to stop.
+Open `http://127.0.0.1:8765`; the exact root URL redirects to the bilingual landing page at `/home`. The sidebar provides an icon-only Home link and an icon-only Settings button side by side. The server binds to the local computer only; keep the terminal window open while using it and press `Ctrl+C` to stop.
 
-The web interface supports English and French. Open **Settings** to choose a language; the preference is stored in the current browser on the current device. File-operation previews show 25 entries per page, and unknown web routes display a localized not-found page.
+The web tools have direct URLs: `/tools/01` (File Renamer), `/tools/02` (Extension Editor), and `/tools/undo` (Undo Changes). Open **Settings** from the navigation; it is a modal represented by the current URL with `?settings=true`.
+
+The interface supports English and French. In Settings, **Do not save preferences** is enabled by default; reloading then resets the language to English. Disable it to save the language and persistence choice in this browser. The server also disables HTTP caching. File-operation previews show 25 entries per page, and unknown web routes display a localized not-found page.
 
 The web app previews file operations before applying them, can make full-copy or ZIP backups, and saves optional JSON undo logs under `Desktop\FilesEditor`. Changing an extension changes the filename only; it does not convert the file contents.
 

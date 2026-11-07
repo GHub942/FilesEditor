@@ -12,7 +12,9 @@ const elements = {
   backupPanel: document.querySelector("#backupPanel"),
   undoBackupPanel: document.querySelector("#undoBackupPanel"),
   scanOptions: document.querySelector("#scanOptions"),
+  topbar: document.querySelector("#topbar"),
   workspaceView: document.querySelector("#workspaceView"),
+  landingView: document.querySelector("#landingView"),
   pageHeading: document.querySelector("#pageHeading"),
   notFoundView: document.querySelector("#notFoundView"),
   settingsDialog: document.querySelector("#settingsDialog"),
@@ -37,6 +39,7 @@ const elements = {
   undoLogName: document.querySelector("#undoLogName"),
   undoLogStatus: document.querySelector("#undoLogStatus"),
   languageSelect: document.querySelector("#languageSelect"),
+  forgetPreferences: document.querySelector("#forgetPreferences"),
   toast: document.querySelector("#toast")
 };
 
@@ -49,10 +52,14 @@ let currentPreviewPage = 0;
 let toastTimer = null;
 
 document.querySelectorAll(".nav-item[data-mode]").forEach((button) => {
-  button.addEventListener("click", () => setMode(button.dataset.mode));
+  button.addEventListener("click", (event) => {
+    event.preventDefault();
+    setMode(button.dataset.mode);
+  });
 });
 document.querySelector('[data-page="settings"]').addEventListener("click", openSettingsDialog);
-document.querySelector("#closeSettingsButton").addEventListener("click", () => elements.settingsDialog.close());
+document.querySelector("#closeSettingsButton").addEventListener("click", closeSettingsDialog);
+elements.settingsDialog.addEventListener("close", removeSettingsQuery);
 elements.recursive.addEventListener("change", () => {
   elements.excludeBox.hidden = !elements.recursive.checked;
   clearPreview();
@@ -63,6 +70,7 @@ elements.applyButton.addEventListener("click", applyChanges);
 elements.previousPreviewPage.addEventListener("click", () => changePreviewPage(-1));
 elements.nextPreviewPage.addEventListener("click", () => changePreviewPage(1));
 elements.languageSelect.addEventListener("change", changeLanguage);
+elements.forgetPreferences.addEventListener("change", changePreferencePersistence);
 window.addEventListener("popstate", syncRouteFromLocation);
 
 initialize();
@@ -70,12 +78,7 @@ initialize();
 async function initialize() {
   try {
     await loadDictionaries();
-    try {
-      const savedLanguage = localStorage.getItem("files-editor-language");
-      if (SUPPORTED_LANGUAGES.includes(savedLanguage)) currentLanguage = savedLanguage;
-    } catch (error) {
-      console.warn("Could not read the saved language preference.", error);
-    }
+    restorePreferences();
     elements.languageSelect.value = currentLanguage;
     syncRouteFromLocation();
     applyTranslations();
@@ -84,6 +87,32 @@ async function initialize() {
   } catch (error) {
     showToast(error.message, true, 8000);
   }
+}
+
+function restorePreferences() {
+  try {
+    const saveEnabled = localStorage.getItem("files-editor-save-preferences") === "true";
+    elements.forgetPreferences.checked = !saveEnabled;
+    if (saveEnabled) {
+      const savedLanguage = localStorage.getItem("files-editor-language");
+      if (SUPPORTED_LANGUAGES.includes(savedLanguage)) currentLanguage = savedLanguage;
+    } else {
+      clearSavedPreferences();
+    }
+  } catch (error) {
+    elements.forgetPreferences.checked = true;
+    currentLanguage = "en";
+    console.warn("Could not read saved preferences; using the no-save defaults.", error);
+  }
+}
+
+function clearSavedPreferences() {
+  const preferenceKeys = [];
+  for (let index = 0; index < localStorage.length; index += 1) {
+    const key = localStorage.key(index);
+    if (key?.startsWith("files-editor-")) preferenceKeys.push(key);
+  }
+  preferenceKeys.forEach((key) => localStorage.removeItem(key));
 }
 
 async function loadDictionaries() {
@@ -125,44 +154,91 @@ function changeLanguage() {
   const language = elements.languageSelect.value;
   if (!SUPPORTED_LANGUAGES.includes(language)) return;
   currentLanguage = language;
-  try {
-    localStorage.setItem("files-editor-language", currentLanguage);
-  } catch (error) {
-    showToast(translate("messages.preferenceNotSaved"), true, 7000);
-    console.error("Could not save the language preference.", error);
+  if (!elements.forgetPreferences.checked) {
+    try {
+      savePreferences();
+    } catch (error) {
+      elements.forgetPreferences.checked = true;
+      console.error("Could not save the language preference.", error);
+      showToast(translate("messages.preferenceNotSaved"), true, 7000);
+      try {
+        clearSavedPreferences();
+      } catch (clearError) {
+        console.error("Could not clear the saved preferences.", clearError);
+      }
+    }
   }
   applyTranslations();
+}
+
+function changePreferencePersistence() {
+  try {
+    if (elements.forgetPreferences.checked) {
+      clearSavedPreferences();
+    } else {
+      savePreferences();
+    }
+  } catch (error) {
+    elements.forgetPreferences.checked = true;
+    console.error("Could not update the preference persistence setting.", error);
+    showToast(translate("messages.preferenceNotSaved"), true, 7000);
+    try {
+      clearSavedPreferences();
+    } catch (clearError) {
+      console.error("Could not clear the saved preferences.", clearError);
+    }
+  }
+}
+
+function savePreferences() {
+  localStorage.setItem("files-editor-save-preferences", "true");
+  localStorage.setItem("files-editor-language", currentLanguage);
 }
 
 function setMode(mode) {
   if (!["rename", "extensions", "undo"].includes(mode)) return;
   currentMode = mode;
   currentPage = "workspace";
-  history.pushState({}, "", mode === "rename" ? "/" : `/${mode}`);
+  const route = { rename: "/tools/01", extensions: "/tools/02", undo: "/tools/undo" }[mode];
+  history.pushState({}, "", route);
   renderMode();
   renderPage();
   clearPreview();
 }
 
 function openSettingsDialog() {
+  if (new URL(window.location.href).searchParams.get("settings") !== "true") {
+    const url = new URL(window.location.href);
+    url.searchParams.set("settings", "true");
+    history.pushState({}, "", `${url.pathname}${url.search}${url.hash}`);
+  }
   if (!elements.settingsDialog.open) elements.settingsDialog.showModal();
+}
+
+function closeSettingsDialog() {
+  if (elements.settingsDialog.open) elements.settingsDialog.close();
+  removeSettingsQuery();
+}
+
+function removeSettingsQuery() {
+  const url = new URL(window.location.href);
+  if (url.searchParams.get("settings") !== "true") return;
+  url.searchParams.delete("settings");
+  history.replaceState(history.state, "", `${url.pathname}${url.search}${url.hash}`);
 }
 
 function syncRouteFromLocation() {
   const route = window.location.pathname.replace(/\/+$/, "") || "/";
-  if (route === "/settings") {
-    history.replaceState({}, "", "/");
-    currentPage = "workspace";
-    currentMode = "rename";
-    openSettingsDialog();
-  } else {
-    if (elements.settingsDialog.open) elements.settingsDialog.close();
-    const modes = { "/": "rename", "/extensions": "extensions", "/undo": "undo" };
-    currentMode = modes[route] || "rename";
-    currentPage = modes[route] ? "workspace" : "notFound";
-  }
+  const modes = { "/tools/01": "rename", "/tools/02": "extensions", "/tools/undo": "undo" };
+  currentMode = modes[route] || "rename";
+  currentPage = route === "/home" ? "landing" : modes[route] ? "workspace" : "notFound";
   renderMode();
   renderPage();
+  if (new URL(window.location.href).searchParams.get("settings") === "true") {
+    if (!elements.settingsDialog.open) elements.settingsDialog.showModal();
+  } else if (elements.settingsDialog.open) {
+    elements.settingsDialog.close();
+  }
 }
 
 function renderMode() {
@@ -184,20 +260,26 @@ function renderMode() {
 }
 
 function renderPage() {
+  const landing = currentPage === "landing";
   const notFound = currentPage === "notFound";
-  elements.workspaceView.hidden = notFound;
-  elements.pageHeading.hidden = notFound;
+  const workspace = currentPage === "workspace";
+  elements.landingView.hidden = !landing;
+  elements.workspaceView.hidden = !workspace;
+  elements.pageHeading.hidden = !workspace;
   elements.notFoundView.hidden = !notFound;
-  elements.stepIndicator.hidden = notFound;
+  elements.stepIndicator.hidden = !workspace;
+  elements.topbar.hidden = notFound;
   const pageKey = { rename: "renamer", extensions: "extensions", undo: "undo" }[currentMode];
-  const navigationKey = notFound ? "navigation.notFound" : `navigation.${pageKey}`;
-  if (!notFound) {
+  const navigationKey = landing ? "navigation.home" : notFound ? "navigation.notFound" : `navigation.${pageKey}`;
+  if (workspace) {
     elements.pageTitle.textContent = translate(`pages.${pageKey}.title`);
     elements.pageDescription.textContent = translate(`pages.${pageKey}.description`);
   }
   document.title = notFound
     ? `${translate("notFound.title")} | ${translate("app.title")}`
-    : translate("app.title");
+    : landing
+      ? `${translate("landing.title")} | ${translate("app.title")}`
+      : translate("app.title");
   elements.breadcrumbTitle.textContent = translate(navigationKey);
   const settingsButton = document.querySelector('[data-page="settings"]');
   settingsButton.classList.remove("active");

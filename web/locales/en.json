@@ -9,6 +9,7 @@
   },
   "navigation": {
     "workspace": "WORKSPACE",
+    "home": "HOME",
     "fileTools": "File tools",
     "renamer": "File renamer",
     "extensions": "Extension editor",
@@ -41,6 +42,20 @@
     "title": "Page not found",
     "description": "The page you requested does not exist or may have moved.",
     "home": "Return to Files Editor"
+  },
+  "landing": {
+    "eyebrow": "LOCAL FILE TOOLS",
+    "title": "Take control of your files.",
+    "description": "Rename, organize extensions, and undo changes with a clear preview before anything is applied.",
+    "primaryAction": "Open File Renamer",
+    "renamerTitle": "File Renamer",
+    "renamerDescription": "Give files consistent, category-based names.",
+    "extensionTitle": "Extension Editor",
+    "extensionDescription": "Update filename extensions in a reviewed batch.",
+    "undoTitle": "Undo Changes",
+    "undoDescription": "Restore original names from a Files Editor log.",
+    "openTool": "Open tool",
+    "privacy": "Local by design. Your files stay on this computer."
   },
   "workflow": {
     "configure": "CONFIGURE",
@@ -176,7 +191,9 @@
     "languageTitle": "Language",
     "languageDescription": "Choose the language used across Files Editor.",
     "languageLabel": "INTERFACE LANGUAGE",
-    "languageHelp": "Your language preference is saved in this browser on this device.",
+    "languageHelp": "Choose whether to remember your interface language in this browser.",
+    "forgetTitle": "Do not save preferences",
+    "forgetDescription": "When enabled, preferences are not stored and reloading resets the language to English.",
     "localTitle": "Local processing",
     "localDescription": "Your files remain on this device.",
     "localNote": "Files Editor runs locally and does not upload files or use analytics."

@@ -22,17 +22,30 @@ class FilesEditorHandler(BaseHTTPRequestHandler):
     server_version = "FilesEditorWeb/1.0"
 
     def do_GET(self):
+        requested_url = urlsplit(self.path)
+        if requested_url.path == "/":
+            destination = "/home"
+            if requested_url.query:
+                destination += f"?{requested_url.query}"
+            self.send_response(302)
+            self.send_header("Location", destination)
+            self.send_header("Cache-Control", "no-store")
+            self.send_header("Content-Length", "0")
+            self._security_headers()
+            self.end_headers()
+            return
+
         routes = {
-            "/": ("index.html", "text/html; charset=utf-8"),
-            "/extensions": ("index.html", "text/html; charset=utf-8"),
-            "/undo": ("index.html", "text/html; charset=utf-8"),
-            "/settings": ("index.html", "text/html; charset=utf-8"),
+            "/home": ("index.html", "text/html; charset=utf-8"),
+            "/tools/01": ("index.html", "text/html; charset=utf-8"),
+            "/tools/02": ("index.html", "text/html; charset=utf-8"),
+            "/tools/undo": ("index.html", "text/html; charset=utf-8"),
             "/app.js": ("app.js", "text/javascript; charset=utf-8"),
             "/styles.css": ("styles.css", "text/css; charset=utf-8"),
             "/locales/en.json": ("locales/en.json", "application/json; charset=utf-8"),
             "/locales/fr.json": ("locales/fr.json", "application/json; charset=utf-8"),
         }
-        route = routes.get(urlsplit(self.path).path)
+        route = routes.get(requested_url.path)
         status = 200
         if route is None:
             route = ("index.html", "text/html; charset=utf-8")

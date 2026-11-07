@@ -11,27 +11,33 @@
 <body>
   <div class="app-shell">
     <aside class="sidebar">
-      <a class="brand" href="/" aria-label="Files Editor home" data-i18n-aria-label="app.home">
+      <a class="brand" href="/home" aria-label="Files Editor home" data-i18n-aria-label="app.home">
         <span class="brand-mark" aria-hidden="true">
           <svg viewBox="0 0 32 32"><path d="M7 4h12l6 6v18H7z"/><path d="M19 4v7h7M11 17h10M11 22h7"/></svg>
         </span>
         <span class="brand-copy"><strong data-i18n="app.title">Files Editor</strong><small data-i18n="app.localWorkspace">LOCAL WORKSPACE</small></span>
       </a>
 
+      <nav class="sidebar-quick-nav">
+        <a class="icon-nav-button" href="/home" aria-label="Home" data-i18n-aria-label="app.home">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3.5 10 8.5-7 8.5 7v10a1 1 0 0 1-1 1h-5.5v-6h-4v6H4.5a1 1 0 0 1-1-1z"/></svg>
+        </a>
+        <button class="icon-nav-button" type="button" data-page="settings" aria-label="Settings" data-i18n-aria-label="navigation.settings" aria-haspopup="dialog" aria-controls="settingsDialog">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Z"/><path d="m19.4 15 .1.1 1.4 1.1-1.4 2.4-1.7-.7a8 8 0 0 1-1.5.9l-.3 1.8h-2.8l-.3-1.8a8 8 0 0 1-1.5-.9l-1.7.7-1.4-2.4 1.4-1.1a7 7 0 0 1 0-1.8l-1.4-1.1 1.4-2.4 1.7.7a8 8 0 0 1 1.5-.9l.3-1.8h2.8l.3 1.8a8 8 0 0 1 1.5.9l1.7-.7 1.4 2.4-1.4 1.1a7 7 0 0 1 .5 1.7Z" transform="translate(-1 -1) scale(1.08)"/></svg>
+        </button>
+      </nav>
+
       <div class="sidebar-label" data-i18n="navigation.workspace">WORKSPACE</div>
       <nav class="tool-nav" aria-label="File tools" data-i18n-aria-label="navigation.fileTools">
-        <button class="nav-item active" type="button" data-mode="rename" aria-current="page">
+        <a class="nav-item active" href="/tools/01" data-mode="rename" aria-current="page">
           <span class="nav-icon">01</span><span data-i18n="navigation.renamer">File renamer</span>
-        </button>
-        <button class="nav-item" type="button" data-mode="extensions" aria-current="false">
+        </a>
+        <a class="nav-item" href="/tools/02" data-mode="extensions" aria-current="false">
           <span class="nav-icon">02</span><span data-i18n="navigation.extensions">Extension editor</span>
-        </button>
-        <button class="nav-item" type="button" data-mode="undo" aria-current="false">
+        </a>
+        <a class="nav-item" href="/tools/undo" data-mode="undo" aria-current="false">
           <span class="nav-icon">03</span><span data-i18n="navigation.undo">Undo changes</span>
-        </button>
-        <button class="nav-item" type="button" data-page="settings" aria-haspopup="dialog" aria-controls="settingsDialog" aria-current="false">
-          <span class="nav-icon settings-nav-icon" aria-hidden="true"></span><span data-i18n="navigation.settings">Settings</span>
-        </button>
+        </a>
       </nav>
 
       <div class="sidebar-spacer"></div>
@@ -43,10 +49,40 @@
     </aside>
 
     <main class="main-content">
-      <header class="topbar">
+      <header class="topbar" id="topbar">
         <div class="breadcrumb"><span data-i18n="navigation.workspace">Workspace</span><span class="crumb-slash">/</span><strong id="breadcrumbTitle" data-i18n="navigation.renamer">File renamer</strong></div>
         <div class="server-status"><span class="status-dot"></span><span data-i18n="status.runningLocally">Running locally</span></div>
       </header>
+
+      <section class="landing-view" id="landingView" hidden>
+        <div class="landing-hero">
+          <div class="eyebrow"><span class="eyebrow-line"></span><span data-i18n="landing.eyebrow">LOCAL FILE TOOLS</span></div>
+          <h1 data-i18n="landing.title">Take control of your files.</h1>
+          <p data-i18n="landing.description">Rename, organize extensions, and undo changes with a clear preview before anything is applied.</p>
+          <a class="primary-button landing-cta" href="/tools/01" data-i18n="landing.primaryAction">Open File Renamer</a>
+        </div>
+        <div class="landing-tools">
+          <a class="landing-tool-card" href="/tools/01">
+            <span class="landing-tool-number">01</span>
+            <h2 data-i18n="landing.renamerTitle">File Renamer</h2>
+            <p data-i18n="landing.renamerDescription">Give files consistent, category-based names.</p>
+            <span class="landing-tool-link" data-i18n="landing.openTool">Open tool</span>
+          </a>
+          <a class="landing-tool-card" href="/tools/02">
+            <span class="landing-tool-number">02</span>
+            <h2 data-i18n="landing.extensionTitle">Extension Editor</h2>
+            <p data-i18n="landing.extensionDescription">Update filename extensions in a reviewed batch.</p>
+            <span class="landing-tool-link" data-i18n="landing.openTool">Open tool</span>
+          </a>
+          <a class="landing-tool-card" href="/tools/undo">
+            <span class="landing-tool-number">03</span>
+            <h2 data-i18n="landing.undoTitle">Undo Changes</h2>
+            <p data-i18n="landing.undoDescription">Restore original names from a Files Editor log.</p>
+            <span class="landing-tool-link" data-i18n="landing.openTool">Open tool</span>
+          </a>
+        </div>
+        <p class="landing-privacy" data-i18n="landing.privacy">Local by design. Your files stay on this computer.</p>
+      </section>
 
       <section class="page-heading" id="pageHeading">
         <div>
@@ -232,7 +268,7 @@
         <div class="not-found-code" aria-hidden="true">404</div>
         <h1 data-i18n="notFound.title">Page not found</h1>
         <p data-i18n="notFound.description">The page you requested does not exist or may have moved.</p>
-        <a class="primary-button not-found-home" href="/" data-i18n="notFound.home">Return to Files Editor</a>
+        <a class="primary-button not-found-home" href="/home" data-i18n="notFound.home">Return to Files Editor</a>
       </section>
 
       <dialog id="settingsDialog" class="settings-dialog" aria-labelledby="settingsDialogTitle">
@@ -250,8 +286,13 @@
             <option value="en">English</option>
             <option value="fr">Français</option>
           </select>
-          <p class="field-hint" data-i18n="settings.languageHelp">Your language preference is saved in this browser on this device.</p>
+          <p class="field-hint" data-i18n="settings.languageHelp">Choose whether to remember your interface language in this browser.</p>
         </div>
+        <label class="preference-toggle panel">
+          <input id="forgetPreferences" type="checkbox" checked>
+          <span class="custom-check" aria-hidden="true"></span>
+          <span><strong data-i18n="settings.forgetTitle">Do not save preferences</strong><small data-i18n="settings.forgetDescription">When enabled, reloading resets your language to English.</small></span>
+        </label>
         <div class="panel settings-info">
           <div class="panel-heading">
             <span class="panel-icon backup-icon" aria-hidden="true"></span>

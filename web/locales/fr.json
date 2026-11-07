@@ -9,6 +9,7 @@
   },
   "navigation": {
     "workspace": "ESPACE DE TRAVAIL",
+    "home": "ACCUEIL",
     "fileTools": "Outils de fichiers",
     "renamer": "Renommer des fichiers",
     "extensions": "Modifier les extensions",
@@ -41,6 +42,20 @@
     "title": "Page introuvable",
     "description": "La page demandée n’existe pas ou a peut-être été déplacée.",
     "home": "Retourner à Files Editor"
+  },
+  "landing": {
+    "eyebrow": "OUTILS DE FICHIERS LOCAUX",
+    "title": "Reprenez le contrôle de vos fichiers.",
+    "description": "Renommez vos fichiers, modifiez leurs extensions et annulez les changements grâce à un aperçu avant application.",
+    "primaryAction": "Ouvrir le renommeur",
+    "renamerTitle": "Renommer des fichiers",
+    "renamerDescription": "Attribuez des noms cohérents selon la catégorie des fichiers.",
+    "extensionTitle": "Modifier les extensions",
+    "extensionDescription": "Modifiez les extensions par lots après vérification.",
+    "undoTitle": "Annuler les changements",
+    "undoDescription": "Restaurez les noms d’origine depuis un journal Files Editor.",
+    "openTool": "Ouvrir l’outil",
+    "privacy": "Conçu pour un usage local. Vos fichiers restent sur cet ordinateur."
   },
   "workflow": {
     "configure": "CONFIGURER",
@@ -176,7 +191,9 @@
     "languageTitle": "Langue",
     "languageDescription": "Choisissez la langue utilisée dans Files Editor.",
     "languageLabel": "LANGUE DE L’INTERFACE",
-    "languageHelp": "Votre préférence linguistique est enregistrée dans ce navigateur, sur cet appareil.",
+    "languageHelp": "Choisissez si la langue de l’interface doit être mémorisée dans ce navigateur.",
+    "forgetTitle": "Ne pas enregistrer les préférences",
+    "forgetDescription": "Si cette option est activée, rien n’est mémorisé et F5 réinitialise la langue en anglais.",
     "localTitle": "Traitement local",
     "localDescription": "Vos fichiers restent sur cet appareil.",
     "localNote": "Files Editor fonctionne localement, sans téléversement de fichiers ni outil d’analyse d’audience."
