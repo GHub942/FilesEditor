@@ -2,7 +2,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from web.file_operations import OperationError, apply_preview, create_preview
+from WEB.file_operations import OperationError, apply_preview, create_preview
 
 
 class FileOperationTests(unittest.TestCase):

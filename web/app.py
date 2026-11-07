@@ -6,12 +6,10 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import urlsplit
 
-from file_operations import (
-    OperationError,
-    apply_preview,
-    create_preview,
-    preview_response,
-)
+if __package__:
+    from .file_operations import OperationError, apply_preview, create_preview, preview_response
+else:
+    from file_operations import OperationError, apply_preview, create_preview, preview_response
 
 
 WEB_DIR = Path(__file__).resolve().parent
@@ -26,8 +24,13 @@ class FilesEditorHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         routes = {
             "/": ("index.html", "text/html; charset=utf-8"),
+            "/extensions": ("index.html", "text/html; charset=utf-8"),
+            "/undo": ("index.html", "text/html; charset=utf-8"),
+            "/settings": ("index.html", "text/html; charset=utf-8"),
             "/app.js": ("app.js", "text/javascript; charset=utf-8"),
             "/styles.css": ("styles.css", "text/css; charset=utf-8"),
+            "/locales/en.json": ("locales/en.json", "application/json; charset=utf-8"),
+            "/locales/fr.json": ("locales/fr.json", "application/json; charset=utf-8"),
         }
         route = routes.get(urlsplit(self.path).path)
         if route is None:
@@ -42,6 +45,7 @@ class FilesEditorHandler(BaseHTTPRequestHandler):
         self.send_response(200)
         self.send_header("Content-Type", content_type)
         self.send_header("Content-Length", str(len(content)))
+        self.send_header("Cache-Control", "no-store")
         self._security_headers()
         self.end_headers()
         self.wfile.write(content)

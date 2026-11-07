@@ -1,0 +1,82 @@
+# Ignore all files by default.
+*
+
+# Keep directories traversable so whitelisted files can be included.
+!*/
+
+# Repository configuration.
+!.gitignore
+
+# Human-facing documentation.
+!*.md
+
+# Source code and configuration.
+!*.py
+!*.html
+!*.css
+!*.scss
+!*.js
+!*.ts
+!*.json
+!*.yaml
+!*.yml
+!*.toml
+!*.cfg
+!*.ini
+!*.sh
+!*.ps1
+!*.bat
+!*.cmd
+!*.sql
+
+# Assets.
+!*.svg
+!*.ico
+!*.woff
+!*.woff2
+
+# Environment template.
+!.env.example
+
+# Never commit these files or directories.
+.env
+.env.*
+!.env.example
+.agents/
+.history/
+*.7z
+*.zip
+*.tar
+*.gz
+logs/
+audit/
+dist/
+build/
+__pycache__/
+*.log
+*.tmp
+*.bak
+*.pyc
+*.pyo
+.test/
+data/
+scratch/
+node_modules/
+.venv/
+venv/
+ENV/
+*.exe
+*.dll
+*.so
+*.dylib
+*.app
+*.key
+*.pem
+*.p12
+*.pfx
+secrets/
+credentials/
+*.user
+.DS_Store
+Thumbs.db
+desktop.ini

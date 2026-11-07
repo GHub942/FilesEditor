@@ -79,6 +79,8 @@ button { cursor: pointer; }
 .nav-item.active { border-color: #315451; background: #23423f; color: #f7fffc; }
 .nav-icon { display: grid; width: 26px; height: 25px; place-items: center; border-radius: 6px; background: #223b45; color: #a1b5b9; font: 500 9px var(--mono); }
 .nav-item.active .nav-icon { background: #2c5c53; color: #7fe0bf; }
+.settings-nav-icon::before { width: 10px; height: 10px; border: 1.5px solid currentColor; border-radius: 50%; content: ''; }
+.settings-nav-icon::after { position: absolute; width: 3px; height: 3px; border-radius: 50%; background: currentColor; content: ''; }
 
 .sidebar-spacer { flex: 1; }
 .local-card { display: flex; gap: 10px; padding: 14px 12px; border: 1px solid #314750; border-radius: 9px; background: #1c333d; }
@@ -256,6 +258,13 @@ td.new-name { color: #2d8476; }
 .workflow-step strong { color: #63727a; font-size: 10px; font-weight: 600; }
 .workflow-step small { margin-top: 2px; color: #98a4aa; font-size: 9px; line-height: 1.45; }
 
+.settings-view { display: grid; max-width: 760px; gap: 14px; }
+.settings-panel, .settings-info { padding: 22px; }
+.language-select { width: min(100%, 360px); height: 40px; padding: 0 11px; border: 1px solid #e2e8eb; border-radius: 6px; outline: 0; background: #fff; color: #34434c; font: 12px var(--font); }
+.language-select:focus { border-color: #64a99a; box-shadow: 0 0 0 3px rgb(48 148 126 / 10%); }
+.settings-note { margin: 0; color: #78878e; font-size: 11px; line-height: 1.7; }
+.settings-nav-icon { position: relative; }
+
 .toast { position: fixed; right: 24px; bottom: 22px; z-index: 5; max-width: min(440px, calc(100vw - 32px)); padding: 12px 16px; border: 1px solid #dce8e4; border-radius: 7px; background: #fff; box-shadow: 0 8px 28px rgb(22 48 53 / 12%); color: #4e6864; font-size: 11px; opacity: 0; pointer-events: none; transform: translateY(8px); transition: opacity .2s ease, transform .2s ease; }
 .toast.visible { opacity: 1; transform: translateY(0); }
 .toast.error { border-color: #efd3cf; color: #a45b50; }
@@ -282,7 +291,7 @@ td.new-name { color: #2d8476; }
   .sidebar { position: static; width: auto; height: auto; padding: 12px 14px 10px; }
   .brand { margin: 0 0 11px; }
   .sidebar-label, .sidebar-spacer, .local-card, .sidebar-footer { display: none; }
-  .tool-nav { grid-template-columns: repeat(3, 1fr); gap: 5px; }
+  .tool-nav { grid-template-columns: repeat(4, 1fr); gap: 5px; }
   .nav-item { justify-content: center; gap: 6px; min-height: 37px; padding: 0 5px; font-size: 10px; }
   .nav-icon { width: 22px; height: 21px; font-size: 8px; }
   .main-content { min-height: calc(100vh - 106px); margin-left: 0; padding: 0 14px 28px; }

@@ -1,0 +1,247 @@
+{
+  "app": {
+    "title": "Files Editor",
+    "name": "FILES EDITOR",
+    "home": "Files Editor home",
+    "localWorkspace": "LOCAL WORKSPACE",
+    "webVersion": "WEB 1.0",
+    "tagline": "YOUR FILES, YOUR DEVICE"
+  },
+  "navigation": {
+    "workspace": "WORKSPACE",
+    "fileTools": "File tools",
+    "renamer": "File renamer",
+    "extensions": "Extension editor",
+    "undo": "Undo changes",
+    "settings": "Settings"
+  },
+  "privacy": {
+    "title": "Private by design",
+    "description": "Files stay on this computer. Nothing is uploaded."
+  },
+  "status": {
+    "runningLocally": "Running locally"
+  },
+  "pages": {
+    "renamer": {
+      "title": "File renamer",
+      "description": "Give files a consistent name with category-aware numbering."
+    },
+    "extensions": {
+      "title": "Extension editor",
+      "description": "Update file extensions in batches, with a clear preview first."
+    },
+    "undo": {
+      "title": "Undo changes",
+      "description": "Restore original filenames from a Files Editor undo log."
+    },
+    "settings": {
+      "title": "Settings",
+      "description": "Personalize your Files Editor experience."
+    }
+  },
+  "workflow": {
+    "configure": "CONFIGURE",
+    "preview": "PREVIEW",
+    "apply": "APPLY",
+    "title": "HOW IT WORKS",
+    "stepConfigure": "Configure",
+    "stepConfigureHelp": "Choose the folder and set your preferences.",
+    "stepReview": "Review",
+    "stepReviewHelp": "Check every proposed filename before continuing.",
+    "stepApply": "Apply",
+    "stepApplyHelp": "Confirm to make the changes on your device."
+  },
+  "operation": {
+    "configuration": "Operation configuration",
+    "confirmationNote": "Changes are never applied without your confirmation."
+  },
+  "common": {
+    "required": "REQUIRED"
+  },
+  "folder": {
+    "title": "Target folder",
+    "description": "Choose the folder containing the files to process.",
+    "pathLabel": "FOLDER PATH",
+    "pathPlaceholder": "C:\\Users\\you\\Documents\\My files",
+    "pathHint": "PATH",
+    "pathHelp": "Enter the full local path. Example:",
+    "examplePath": "C:\\Users\\you\\Downloads",
+    "includeSubfolders": "Include subfolders",
+    "scanDescendants": "Scan folders below the target folder",
+    "excludedLabel": "EXCLUDED FOLDER NAMES",
+    "excludedPlaceholder": ".venv, node_modules, .git",
+    "excludedHelp": "Common development and temporary folders are excluded by default. Enter",
+    "excludedHelpEnd": "to include everything."
+  },
+  "rename": {
+    "title": "Naming format",
+    "description": "Set the pattern used for each matching file.",
+    "globalPrefix": "GLOBAL PREFIX",
+    "prefixPlaceholder": "Folder name (automatic)",
+    "prefixHelp": "Leave blank to use each file's parent folder.",
+    "separator": "SEPARATOR",
+    "separatorHelp": "Between folder name and category.",
+    "padding": "NUMBER PADDING",
+    "paddingHelp": "For example, 3 gives 001, 002, 003.",
+    "categories": "CATEGORIES TO RENAME",
+    "customPrefixes": "Customize category prefixes",
+    "prefixAria": {
+      "IMG": "Image prefix",
+      "VID": "Video prefix",
+      "ARC": "Archive prefix",
+      "AUD": "Audio prefix",
+      "DOC": "Document prefix"
+    }
+  },
+  "extensions": {
+    "title": "Target extensions",
+    "description": "Choose a new filename extension for each media category.",
+    "aria": {
+      "IMG": "Image target extension",
+      "VID": "Video target extension",
+      "AUD": "Audio target extension",
+      "DOC": "Document target extension",
+      "ARC": "Archive target extension"
+    },
+    "noticeStart": "This changes the filename only. It does",
+    "noticeEmphasis": "not",
+    "noticeEnd": "convert the file's contents."
+  },
+  "categories": {
+    "images": "Images",
+    "videos": "Videos",
+    "audio": "Audio",
+    "documents": "Documents",
+    "archives": "Archives"
+  },
+  "undo": {
+    "title": "Undo log",
+    "description": "Select the JSON log created by a previous operation.",
+    "chooseLog": "Choose an undo log",
+    "fileHelp": "JSON files only · Read locally in your browser",
+    "folderHelp": "The target folder must match the one recorded in the log.",
+    "invalidFile": "This file is not a valid undo log.",
+    "fileTooLarge": "Choose a JSON file smaller than 5 MB.",
+    "selectedOne": "1 recorded change. Target: {folder}",
+    "selectedMany": "{count} recorded changes. Target: {folder}"
+  },
+  "backup": {
+    "title": "Safety backups",
+    "description": "Stored locally under Desktop\\FilesEditor.",
+    "fullCopy": "Full copy",
+    "fullCopyHelp": "Preserve the original folder structure",
+    "zip": "ZIP archive",
+    "zipHelp": "Compressed copy of affected files",
+    "undoLog": "Undo log",
+    "undoLogHelp": "Required to restore the previous names"
+  },
+  "undoBackup": {
+    "title": "Before restoring",
+    "description": "Optionally keep a copy of the current filenames.",
+    "fullCopyHelp": "Preserve the current folder structure",
+    "zipHelp": "Compressed copy of affected files"
+  },
+  "preview": {
+    "eyebrow": "REVIEW BEFORE APPLYING",
+    "title": "Change preview",
+    "emptyTitle": "Your preview will appear here",
+    "emptyDescription": "Choose a folder and configure your operation, then preview the proposed changes.",
+    "originalName": "ORIGINAL NAME",
+    "newName": "NEW NAME",
+    "change": "Change",
+    "noChangesYet": "Nothing changes until you apply.",
+    "reviewThenApply": "Review the list, then confirm to continue.",
+    "noFilesNeedChanges": "No files need changes.",
+    "oneFileWillChange": "1 file will change",
+    "manyFilesWillChange": "{count} files will change",
+    "showingFirstHundred": "Showing 100 of {count} changes. Apply will process all {count} files."
+  },
+  "actions": {
+    "previewChanges": "Preview changes",
+    "previewRestoration": "Preview restoration",
+    "applyChanges": "Apply changes",
+    "restoreFiles": "Restore files",
+    "scanning": "Scanning...",
+    "applying": "Applying..."
+  },
+  "settings": {
+    "languageTitle": "Language",
+    "languageDescription": "Choose the language used across Files Editor.",
+    "languageLabel": "INTERFACE LANGUAGE",
+    "languageHelp": "Your language preference is saved in this browser on this device.",
+    "localTitle": "Local processing",
+    "localDescription": "Your files remain on this device.",
+    "localNote": "Files Editor runs locally and does not upload files or use analytics."
+  },
+  "messages": {
+    "noChanges": "No changes are needed for the selected files.",
+    "confirmRenameOne": "This will rename 1 file in:\n{folder}\n\nContinue?",
+    "confirmRenameMany": "This will rename {count} files in:\n{folder}\n\nContinue?",
+    "confirmRestoreOne": "This will restore 1 file in:\n{folder}\n\nContinue?",
+    "confirmRestoreMany": "This will restore {count} files in:\n{folder}\n\nContinue?",
+    "actionRename": "rename",
+    "actionRestore": "restore",
+    "fileUpdated": "1 file updated.",
+    "filesUpdated": "{count} files updated.",
+    "fileRestored": "1 file restored.",
+    "filesRestored": "{count} files restored.",
+    "backupLocation": " Backup: {paths}.",
+    "undoLogLocation": " Undo log: {path}",
+    "selectUndoLog": "Choose a valid undo log first.",
+    "folderRequired": "Enter the full path to a target folder.",
+    "invalidServerResponse": "The local server returned an invalid response.",
+    "requestFailed": "Request failed ({status}).",
+    "serverUnavailable": "Could not connect to the local server. Check that Files Editor is still running.",
+    "preferenceNotSaved": "The language changed, but this browser could not save your preference.",
+    "unknownError": "Something went wrong."
+  },
+  "errors": {
+    "enterFolder": "Enter a folder path.",
+    "notFolder": "The selected path is not a folder.",
+    "invalidRequestSize": "Invalid request size.",
+    "emptyOrLargeRequest": "Request body is empty or too large.",
+    "invalidJson": "Request body must contain valid JSON.",
+    "invalidRequestObject": "Request body must be a JSON object.",
+    "unknownOperation": "Unknown operation.",
+    "wrongFolder": "The selected folder must match the folder recorded in the undo log.",
+    "invalidUndoLog": "The selected JSON file is not a valid undo log.",
+    "missingUndoRoot": "The undo log does not contain a target folder.",
+    "invalidLogEntry": "The undo log contains an invalid entry.",
+    "missingLogPaths": "An undo log entry is missing its file paths.",
+    "outsideFolder": "The undo log contains a path outside the selected folder.",
+    "unsupportedMove": "The undo log contains a file move; only same-folder renames can be restored.",
+    "expiredPreview": "This preview expired. Preview the changes again before applying them.",
+    "noChanges": "There are no changes to apply.",
+    "invalidBackupSettings": "Backup settings are invalid.",
+    "backupOptionsBoolean": "Backup options must be enabled or disabled.",
+    "invalidRecursive": "Subfolder scanning must be enabled or disabled.",
+    "excludedList": "Excluded folders must be a list of folder names.",
+    "prefixAndSeparatorText": "The prefix and separator must be text.",
+    "categoryPrefixesObject": "Category prefixes must be an object.",
+    "validCategories": "Choose one or more valid categories.",
+    "extensionTargetsObject": "Extension targets must be an object.",
+    "wholeNumberPadding": "Number padding must be a whole number.",
+    "paddingRange": "Number padding must be between 1 and 12.",
+    "folderOpen": "Folder could not be opened: {detail}",
+    "undoFolderUnavailable": "The folder recorded in the log is unavailable: {detail}",
+    "folderList": "Could not list the selected folder: {detail}",
+    "folderScan": "Could not scan a folder: {detail}",
+    "invalidPrefix": "Enter a valid prefix for {category}.",
+    "invalidExtension": "Invalid extension for {category}: {extension}",
+    "validExtension": "Enter a valid extension for {category}.",
+    "fileNotAvailable": "A file in the preview is no longer available: {path}",
+    "sourceNotAvailable": "A source file is no longer available: {path}",
+    "duplicateDestination": "Two files would receive the same name: {path}",
+    "destinationExists": "A destination already exists: {path}",
+    "destinationAppeared": "A destination appeared during the operation: {path}",
+    "createBackup": "Could not create the requested backup: {detail}",
+    "rollback": "File changes were rolled back: {detail}",
+    "rollbackAlsoFailed": " Rollback also reported: {detail}",
+    "applyFailed": "A file operation failed: {detail}",
+    "loadInterface": "Could not load the web interface: {detail}",
+    "localRequestsOnly": "Requests must come from this local web app.",
+    "endpointNotFound": "Endpoint not found.",
+    "outsideFolderError": "outside the selected folder"
+  }
+}

@@ -4,81 +4,84 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f5f7fb">
-  <title>Files Editor</title>
+  <title data-i18n="app.title">Files Editor</title>
   <link rel="stylesheet" href="/styles.css">
   <script src="/app.js" defer></script>
 </head>
 <body>
   <div class="app-shell">
     <aside class="sidebar">
-      <a class="brand" href="/" aria-label="Files Editor home">
+      <a class="brand" href="/" aria-label="Files Editor home" data-i18n-aria-label="app.home">
         <span class="brand-mark" aria-hidden="true">
           <svg viewBox="0 0 32 32"><path d="M7 4h12l6 6v18H7z"/><path d="M19 4v7h7M11 17h10M11 22h7"/></svg>
         </span>
-        <span class="brand-copy"><strong>Files Editor</strong><small>LOCAL WORKSPACE</small></span>
+        <span class="brand-copy"><strong data-i18n="app.title">Files Editor</strong><small data-i18n="app.localWorkspace">LOCAL WORKSPACE</small></span>
       </a>
 
-      <div class="sidebar-label">WORKSPACE</div>
-      <nav class="tool-nav" aria-label="File tools">
-        <button class="nav-item active" type="button" data-mode="rename">
-          <span class="nav-icon">01</span><span>File renamer</span>
+      <div class="sidebar-label" data-i18n="navigation.workspace">WORKSPACE</div>
+      <nav class="tool-nav" aria-label="File tools" data-i18n-aria-label="navigation.fileTools">
+        <button class="nav-item active" type="button" data-mode="rename" aria-current="page">
+          <span class="nav-icon">01</span><span data-i18n="navigation.renamer">File renamer</span>
         </button>
-        <button class="nav-item" type="button" data-mode="extensions">
-          <span class="nav-icon">02</span><span>Extension editor</span>
+        <button class="nav-item" type="button" data-mode="extensions" aria-current="false">
+          <span class="nav-icon">02</span><span data-i18n="navigation.extensions">Extension editor</span>
         </button>
-        <button class="nav-item" type="button" data-mode="undo">
-          <span class="nav-icon">03</span><span>Undo changes</span>
+        <button class="nav-item" type="button" data-mode="undo" aria-current="false">
+          <span class="nav-icon">03</span><span data-i18n="navigation.undo">Undo changes</span>
+        </button>
+        <button class="nav-item" type="button" data-page="settings" aria-current="false">
+          <span class="nav-icon settings-nav-icon" aria-hidden="true"></span><span data-i18n="navigation.settings">Settings</span>
         </button>
       </nav>
 
       <div class="sidebar-spacer"></div>
       <div class="local-card">
         <span class="local-indicator"></span>
-        <div><strong>Private by design</strong><p>Files stay on this computer. Nothing is uploaded.</p></div>
+        <div><strong data-i18n="privacy.title">Private by design</strong><p data-i18n="privacy.description">Files stay on this computer. Nothing is uploaded.</p></div>
       </div>
-      <div class="sidebar-footer">FILES EDITOR <span>WEB 1.0</span></div>
+      <div class="sidebar-footer"><span data-i18n="app.name">FILES EDITOR</span><span data-i18n="app.webVersion">WEB 1.0</span></div>
     </aside>
 
     <main class="main-content">
       <header class="topbar">
-        <div class="breadcrumb"><span>Workspace</span><span class="crumb-slash">/</span><strong id="breadcrumbTitle">File renamer</strong></div>
-        <div class="server-status"><span class="status-dot"></span>Running locally</div>
+        <div class="breadcrumb"><span data-i18n="navigation.workspace">Workspace</span><span class="crumb-slash">/</span><strong id="breadcrumbTitle" data-i18n="navigation.renamer">File renamer</strong></div>
+        <div class="server-status"><span class="status-dot"></span><span data-i18n="status.runningLocally">Running locally</span></div>
       </header>
 
       <section class="page-heading">
         <div>
-          <div class="eyebrow"><span class="eyebrow-line"></span>YOUR FILES, YOUR DEVICE</div>
-          <h1 id="pageTitle">File renamer</h1>
-          <p id="pageDescription">Give files a consistent name with category-aware numbering.</p>
+          <div class="eyebrow"><span class="eyebrow-line"></span><span data-i18n="app.tagline">YOUR FILES, YOUR DEVICE</span></div>
+          <h1 id="pageTitle" data-i18n="pages.renamer.title">File renamer</h1>
+          <p id="pageDescription" data-i18n="pages.renamer.description">Give files a consistent name with category-aware numbering.</p>
         </div>
-        <div class="step-indicator"><span class="step-number">01</span><span>CONFIGURE <i></i> PREVIEW <i></i> APPLY</span></div>
+        <div class="step-indicator" id="stepIndicator"><span class="step-number">01</span><span><span data-i18n="workflow.configure">CONFIGURE</span> <i></i> <span data-i18n="workflow.preview">PREVIEW</span> <i></i> <span data-i18n="workflow.apply">APPLY</span></span></div>
       </section>
 
-      <div class="workspace-grid">
-        <section class="configuration-column" aria-label="Operation configuration">
+      <div id="workspaceView" class="workspace-grid">
+        <section class="configuration-column" aria-label="Operation configuration" data-i18n-aria-label="operation.configuration">
           <div class="panel folder-panel">
             <div class="panel-heading">
               <span class="panel-icon folder-icon" aria-hidden="true"></span>
-              <div><h2>Target folder</h2><p>Choose the folder containing the files to process.</p></div>
-              <span class="required-tag">REQUIRED</span>
+              <div><h2 data-i18n="folder.title">Target folder</h2><p data-i18n="folder.description">Choose the folder containing the files to process.</p></div>
+              <span class="required-tag" data-i18n="common.required">REQUIRED</span>
             </div>
-            <label class="field-label" for="folderPath">FOLDER PATH</label>
+            <label class="field-label" for="folderPath" data-i18n="folder.pathLabel">FOLDER PATH</label>
             <div class="path-input-wrap">
-              <input id="folderPath" type="text" placeholder="C:\Users\you\Documents\My files" autocomplete="off" spellcheck="false">
-              <span class="input-hint" aria-hidden="true">PATH</span>
+              <input id="folderPath" type="text" placeholder="C:\Users\you\Documents\My files" data-i18n-placeholder="folder.pathPlaceholder" autocomplete="off" spellcheck="false">
+              <span class="input-hint" aria-hidden="true" data-i18n="folder.pathHint">PATH</span>
             </div>
-            <p class="field-hint">Enter the full local path. Example: <code>C:\Users\you\Downloads</code></p>
+            <p class="field-hint"><span data-i18n="folder.pathHelp">Enter the full local path. Example:</span> <code data-i18n="folder.examplePath">C:\Users\you\Downloads</code></p>
 
             <div class="folder-options" id="scanOptions">
               <label class="switch-row">
                 <input id="recursive" type="checkbox">
                 <span class="switch" aria-hidden="true"></span>
-                <span><strong>Include subfolders</strong><small>Scan folders below the target folder</small></span>
+                <span><strong data-i18n="folder.includeSubfolders">Include subfolders</strong><small data-i18n="folder.scanDescendants">Scan folders below the target folder</small></span>
               </label>
               <div class="exclude-box" id="excludeBox" hidden>
-                <label class="field-label" for="excludedDirs">EXCLUDED FOLDER NAMES</label>
-                <input id="excludedDirs" type="text" placeholder=".venv, node_modules, .git">
-                <p class="field-hint">Common development and temporary folders are excluded by default. Enter <code>TAKE ALL</code> to include everything.</p>
+                <label class="field-label" for="excludedDirs" data-i18n="folder.excludedLabel">EXCLUDED FOLDER NAMES</label>
+                <input id="excludedDirs" type="text" placeholder=".venv, node_modules, .git" data-i18n-placeholder="folder.excludedPlaceholder">
+                <p class="field-hint"><span data-i18n="folder.excludedHelp">Common development and temporary folders are excluded by default. Enter</span> <code>TAKE ALL</code> <span data-i18n="folder.excludedHelpEnd">to include everything.</span></p>
               </div>
             </div>
           </div>
@@ -86,26 +89,26 @@
           <div class="panel options-panel" id="renameOptions">
             <div class="panel-heading">
               <span class="panel-icon settings-icon" aria-hidden="true"></span>
-              <div><h2>Naming format</h2><p>Set the pattern used for each matching file.</p></div>
+              <div><h2 data-i18n="rename.title">Naming format</h2><p data-i18n="rename.description">Set the pattern used for each matching file.</p></div>
             </div>
             <div class="form-grid two-columns">
               <div class="field">
-                <label class="field-label" for="globalPrefix">GLOBAL PREFIX</label>
-                <input id="globalPrefix" type="text" placeholder="Folder name (automatic)">
-                <span class="field-hint">Leave blank to use each file's parent folder.</span>
+                <label class="field-label" for="globalPrefix" data-i18n="rename.globalPrefix">GLOBAL PREFIX</label>
+                <input id="globalPrefix" type="text" placeholder="Folder name (automatic)" data-i18n-placeholder="rename.prefixPlaceholder">
+                <span class="field-hint" data-i18n="rename.prefixHelp">Leave blank to use each file's parent folder.</span>
               </div>
               <div class="field">
-                <label class="field-label" for="separator">SEPARATOR</label>
+                <label class="field-label" for="separator" data-i18n="rename.separator">SEPARATOR</label>
                 <input id="separator" type="text" value="__" maxlength="12">
-                <span class="field-hint">Between folder name and category.</span>
+                <span class="field-hint" data-i18n="rename.separatorHelp">Between folder name and category.</span>
               </div>
               <div class="field">
-                <label class="field-label" for="padding">NUMBER PADDING</label>
+                <label class="field-label" for="padding" data-i18n="rename.padding">NUMBER PADDING</label>
                 <input id="padding" type="number" value="3" min="1" max="12">
-                <span class="field-hint">For example, 3 gives 001, 002, 003.</span>
+                <span class="field-hint" data-i18n="rename.paddingHelp">For example, 3 gives 001, 002, 003.</span>
               </div>
               <div class="field">
-                <label class="field-label" for="categoryFilters">CATEGORIES TO RENAME</label>
+                <label class="field-label" for="categoryFilters" data-i18n="rename.categories">CATEGORIES TO RENAME</label>
                 <div class="category-pills" id="categoryFilters">
                   <label><input type="checkbox" value="IMG" checked><span>IMG</span></label>
                   <label><input type="checkbox" value="VID" checked><span>VID</span></label>
@@ -117,13 +120,13 @@
               </div>
             </div>
             <details class="advanced-settings">
-              <summary>Customize category prefixes</summary>
+              <summary data-i18n="rename.customPrefixes">Customize category prefixes</summary>
               <div class="prefix-grid">
-                <label>IMG <input type="text" data-prefix="IMG" value="IMG"></label>
-                <label>VID <input type="text" data-prefix="VID" value="VID"></label>
-                <label>ARC <input type="text" data-prefix="ARC" value="ARC"></label>
-                <label>AUD <input type="text" data-prefix="AUD" value="AUD"></label>
-                <label>DOC <input type="text" data-prefix="DOC" value="DOC"></label>
+                <label><span>IMG</span><input type="text" data-prefix="IMG" value="IMG" aria-label="Image prefix" data-i18n-aria-label="rename.prefixAria.IMG"></label>
+                <label><span>VID</span><input type="text" data-prefix="VID" value="VID" aria-label="Video prefix" data-i18n-aria-label="rename.prefixAria.VID"></label>
+                <label><span>ARC</span><input type="text" data-prefix="ARC" value="ARC" aria-label="Archive prefix" data-i18n-aria-label="rename.prefixAria.ARC"></label>
+                <label><span>AUD</span><input type="text" data-prefix="AUD" value="AUD" aria-label="Audio prefix" data-i18n-aria-label="rename.prefixAria.AUD"></label>
+                <label><span>DOC</span><input type="text" data-prefix="DOC" value="DOC" aria-label="Document prefix" data-i18n-aria-label="rename.prefixAria.DOC"></label>
               </div>
             </details>
           </div>
@@ -131,65 +134,65 @@
           <div class="panel options-panel" id="extensionOptions" hidden>
             <div class="panel-heading">
               <span class="panel-icon settings-icon" aria-hidden="true"></span>
-              <div><h2>Target extensions</h2><p>Choose a new filename extension for each media category.</p></div>
+              <div><h2 data-i18n="extensions.title">Target extensions</h2><p data-i18n="extensions.description">Choose a new filename extension for each media category.</p></div>
             </div>
             <div class="extension-grid">
-              <label><span class="category-badge image-badge">IMG</span><span>Images</span><input type="text" data-extension="IMG" value=".png" aria-label="Image target extension"></label>
-              <label><span class="category-badge video-badge">VID</span><span>Videos</span><input type="text" data-extension="VID" value=".mp4" aria-label="Video target extension"></label>
-              <label><span class="category-badge audio-badge">AUD</span><span>Audio</span><input type="text" data-extension="AUD" value=".mp3" aria-label="Audio target extension"></label>
-              <label><span class="category-badge document-badge">DOC</span><span>Documents</span><input type="text" data-extension="DOC" value=".pdf" aria-label="Document target extension"></label>
-              <label><span class="category-badge archive-badge">ARC</span><span>Archives</span><input type="text" data-extension="ARC" value=".zip" aria-label="Archive target extension"></label>
+              <label><span class="category-badge image-badge">IMG</span><span data-i18n="categories.images">Images</span><input type="text" data-extension="IMG" value=".png" aria-label="Image target extension" data-i18n-aria-label="extensions.aria.IMG"></label>
+              <label><span class="category-badge video-badge">VID</span><span data-i18n="categories.videos">Videos</span><input type="text" data-extension="VID" value=".mp4" aria-label="Video target extension" data-i18n-aria-label="extensions.aria.VID"></label>
+              <label><span class="category-badge audio-badge">AUD</span><span data-i18n="categories.audio">Audio</span><input type="text" data-extension="AUD" value=".mp3" aria-label="Audio target extension" data-i18n-aria-label="extensions.aria.AUD"></label>
+              <label><span class="category-badge document-badge">DOC</span><span data-i18n="categories.documents">Documents</span><input type="text" data-extension="DOC" value=".pdf" aria-label="Document target extension" data-i18n-aria-label="extensions.aria.DOC"></label>
+              <label><span class="category-badge archive-badge">ARC</span><span data-i18n="categories.archives">Archives</span><input type="text" data-extension="ARC" value=".zip" aria-label="Archive target extension" data-i18n-aria-label="extensions.aria.ARC"></label>
             </div>
-            <div class="notice"><span class="notice-mark">i</span><p>This changes the filename only. It does <strong>not</strong> convert the file's contents.</p></div>
+            <div class="notice"><span class="notice-mark" aria-hidden="true">i</span><p><span data-i18n="extensions.noticeStart">This changes the filename only. It does</span> <strong data-i18n="extensions.noticeEmphasis">not</strong> <span data-i18n="extensions.noticeEnd">convert the file's contents.</span></p></div>
           </div>
 
           <div class="panel options-panel undo-panel" id="undoOptions" hidden>
             <div class="panel-heading">
               <span class="panel-icon undo-icon" aria-hidden="true"></span>
-              <div><h2>Undo log</h2><p>Select the JSON log created by a previous operation.</p></div>
+              <div><h2 data-i18n="undo.title">Undo log</h2><p data-i18n="undo.description">Select the JSON log created by a previous operation.</p></div>
             </div>
             <label class="upload-zone" for="undoLogFile">
               <input id="undoLogFile" type="file" accept=".json,application/json">
               <span class="upload-symbol" aria-hidden="true">+</span>
-              <strong id="undoLogName">Choose an undo log</strong>
-              <small>JSON files only · Read locally in your browser</small>
+              <strong id="undoLogName" data-i18n="undo.chooseLog">Choose an undo log</strong>
+              <small data-i18n="undo.fileHelp">JSON files only · Read locally in your browser</small>
             </label>
-            <p class="field-hint" id="undoLogStatus">The target folder must match the one recorded in the log.</p>
+            <p class="field-hint" id="undoLogStatus" data-i18n="undo.folderHelp">The target folder must match the one recorded in the log.</p>
           </div>
 
           <div class="panel backup-panel" id="backupPanel">
             <div class="panel-heading">
               <span class="panel-icon backup-icon" aria-hidden="true"></span>
-              <div><h2>Safety backups</h2><p>Stored locally under Desktop\FilesEditor.</p></div>
+              <div><h2 data-i18n="backup.title">Safety backups</h2><p data-i18n="backup.description">Stored locally under Desktop\FilesEditor.</p></div>
             </div>
             <div class="backup-options">
-              <label><input id="backupCopy" type="checkbox"><span class="custom-check"></span><span><strong>Full copy</strong><small>Preserve the original folder structure</small></span></label>
-              <label><input id="backupZip" type="checkbox"><span class="custom-check"></span><span><strong>ZIP archive</strong><small>Compressed copy of affected files</small></span></label>
-              <label><input id="backupLog" type="checkbox" checked><span class="custom-check"></span><span><strong>Undo log</strong><small>Required to restore the previous names</small></span></label>
+              <label><input id="backupCopy" type="checkbox"><span class="custom-check"></span><span><strong data-i18n="backup.fullCopy">Full copy</strong><small data-i18n="backup.fullCopyHelp">Preserve the original folder structure</small></span></label>
+              <label><input id="backupZip" type="checkbox"><span class="custom-check"></span><span><strong data-i18n="backup.zip">ZIP archive</strong><small data-i18n="backup.zipHelp">Compressed copy of affected files</small></span></label>
+              <label><input id="backupLog" type="checkbox" checked><span class="custom-check"></span><span><strong data-i18n="backup.undoLog">Undo log</strong><small data-i18n="backup.undoLogHelp">Required to restore the previous names</small></span></label>
             </div>
           </div>
 
           <div class="panel backup-panel" id="undoBackupPanel" hidden>
             <div class="panel-heading">
               <span class="panel-icon backup-icon" aria-hidden="true"></span>
-              <div><h2>Before restoring</h2><p>Optionally keep a copy of the current filenames.</p></div>
+              <div><h2 data-i18n="undoBackup.title">Before restoring</h2><p data-i18n="undoBackup.description">Optionally keep a copy of the current filenames.</p></div>
             </div>
             <div class="backup-options">
-              <label><input id="undoBackupCopy" type="checkbox"><span class="custom-check"></span><span><strong>Full copy</strong><small>Preserve the current folder structure</small></span></label>
-              <label><input id="undoBackupZip" type="checkbox"><span class="custom-check"></span><span><strong>ZIP archive</strong><small>Compressed copy of affected files</small></span></label>
+              <label><input id="undoBackupCopy" type="checkbox"><span class="custom-check"></span><span><strong data-i18n="backup.fullCopy">Full copy</strong><small data-i18n="undoBackup.fullCopyHelp">Preserve the current folder structure</small></span></label>
+              <label><input id="undoBackupZip" type="checkbox"><span class="custom-check"></span><span><strong data-i18n="backup.zip">ZIP archive</strong><small data-i18n="undoBackup.zipHelp">Compressed copy of affected files</small></span></label>
             </div>
           </div>
 
           <div class="action-row">
-            <div class="action-note"><span class="lock-icon" aria-hidden="true"></span>Changes are never applied without your confirmation.</div>
-            <button id="previewButton" class="primary-button" type="button"><span>Preview changes</span><span class="button-arrow">-&gt;</span></button>
+            <div class="action-note"><span class="lock-icon" aria-hidden="true"></span><span data-i18n="operation.confirmationNote">Changes are never applied without your confirmation.</span></div>
+            <button id="previewButton" class="primary-button" type="button"><span data-i18n="actions.previewChanges">Preview changes</span><span class="button-arrow" aria-hidden="true">-&gt;</span></button>
           </div>
         </section>
 
         <aside class="preview-column">
           <div class="preview-card">
             <div class="preview-card-heading">
-              <div><div class="eyebrow"><span class="eyebrow-line"></span>REVIEW BEFORE APPLYING</div><h2>Change preview</h2></div>
+              <div><div class="eyebrow"><span class="eyebrow-line"></span><span data-i18n="preview.eyebrow">REVIEW BEFORE APPLYING</span></div><h2 data-i18n="preview.title">Change preview</h2></div>
               <span class="preview-count" id="previewCount">--</span>
             </div>
             <div class="preview-empty" id="previewEmpty">
@@ -197,29 +200,52 @@
                 <span class="paper paper-back"></span><span class="paper paper-front"><i></i><i></i><i></i></span>
                 <span class="empty-spark spark-one"></span><span class="empty-spark spark-two"></span>
               </div>
-              <strong>Your preview will appear here</strong>
-              <p>Choose a folder and configure your operation, then preview the proposed changes.</p>
+              <strong data-i18n="preview.emptyTitle">Your preview will appear here</strong>
+              <p data-i18n="preview.emptyDescription">Choose a folder and configure your operation, then preview the proposed changes.</p>
             </div>
             <div class="preview-results" id="previewResults" hidden>
               <div class="preview-summary" id="previewSummary"></div>
               <div class="preview-table-wrap">
                 <table>
-                  <thead><tr><th>ORIGINAL NAME</th><th aria-label="Change"></th><th>NEW NAME</th></tr></thead>
+                  <thead><tr><th data-i18n="preview.originalName">ORIGINAL NAME</th><th aria-label="Change" data-i18n-aria-label="preview.change"></th><th data-i18n="preview.newName">NEW NAME</th></tr></thead>
                   <tbody id="previewRows"></tbody>
                 </table>
               </div>
               <p class="more-files" id="moreFiles" hidden></p>
             </div>
-            <div class="preview-footer" id="previewFooter"><span class="footer-shield">+</span><span id="previewFooterText">Nothing changes until you apply.</span><button id="applyButton" class="apply-button" type="button" hidden>Apply changes</button></div>
+            <div class="preview-footer" id="previewFooter"><span class="footer-shield" aria-hidden="true">+</span><span id="previewFooterText" data-i18n="preview.noChangesYet">Nothing changes until you apply.</span><button id="applyButton" class="apply-button" type="button" hidden data-i18n="actions.applyChanges">Apply changes</button></div>
           </div>
           <div class="workflow-card">
-            <div class="workflow-heading"><span class="workflow-spark">+</span><span>HOW IT WORKS</span></div>
-            <div class="workflow-step"><span>1</span><p><strong>Configure</strong><small>Choose the folder and set your preferences.</small></p></div>
-            <div class="workflow-step"><span>2</span><p><strong>Review</strong><small>Check every proposed filename before continuing.</small></p></div>
-            <div class="workflow-step"><span>3</span><p><strong>Apply</strong><small>Confirm to make the changes on your device.</small></p></div>
+            <div class="workflow-heading"><span class="workflow-spark" aria-hidden="true">+</span><span data-i18n="workflow.title">HOW IT WORKS</span></div>
+            <div class="workflow-step"><span>1</span><p><strong data-i18n="workflow.stepConfigure">Configure</strong><small data-i18n="workflow.stepConfigureHelp">Choose the folder and set your preferences.</small></p></div>
+            <div class="workflow-step"><span>2</span><p><strong data-i18n="workflow.stepReview">Review</strong><small data-i18n="workflow.stepReviewHelp">Check every proposed filename before continuing.</small></p></div>
+            <div class="workflow-step"><span>3</span><p><strong data-i18n="workflow.stepApply">Apply</strong><small data-i18n="workflow.stepApplyHelp">Confirm to make the changes on your device.</small></p></div>
           </div>
         </aside>
       </div>
+
+      <section id="settingsView" class="settings-view" hidden>
+        <div class="panel settings-panel">
+          <div class="panel-heading">
+            <span class="panel-icon settings-icon" aria-hidden="true"></span>
+            <div><h2 data-i18n="settings.languageTitle">Language</h2><p data-i18n="settings.languageDescription">Choose the language used across Files Editor.</p></div>
+          </div>
+          <label class="field-label" for="languageSelect" data-i18n="settings.languageLabel">INTERFACE LANGUAGE</label>
+          <select id="languageSelect" class="language-select" aria-label="Interface language" data-i18n-aria-label="settings.languageLabel">
+            <option value="en">English</option>
+            <option value="fr">Français</option>
+          </select>
+          <p class="field-hint" data-i18n="settings.languageHelp">Your language preference is saved in this browser on this device.</p>
+        </div>
+        <div class="panel settings-info">
+          <div class="panel-heading">
+            <span class="panel-icon backup-icon" aria-hidden="true"></span>
+            <div><h2 data-i18n="settings.localTitle">Local processing</h2><p data-i18n="settings.localDescription">Your files remain on this device.</p></div>
+          </div>
+          <p class="settings-note" data-i18n="settings.localNote">Files Editor runs locally and does not upload files or use analytics.</p>
+        </div>
+      </section>
+
       <div class="toast" id="toast" role="status" aria-live="polite"></div>
     </main>
   </div>

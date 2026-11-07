@@ -1,18 +1,5 @@
-const modeDetails = {
-  rename: {
-    title: "File renamer",
-    description: "Give files a consistent name with category-aware numbering."
-  },
-  extensions: {
-    title: "Extension editor",
-    description: "Update file extensions in batches, with a clear preview first."
-  },
-  undo: {
-    title: "Undo changes",
-    description: "Restore original filenames from a Files Editor undo log."
-  }
-};
-
+const SUPPORTED_LANGUAGES = ["en", "fr"];
+const dictionaries = {};
 const elements = {
   folder: document.querySelector("#folderPath"),
   recursive: document.querySelector("#recursive"),
@@ -24,6 +11,12 @@ const elements = {
   backupPanel: document.querySelector("#backupPanel"),
   undoBackupPanel: document.querySelector("#undoBackupPanel"),
   scanOptions: document.querySelector("#scanOptions"),
+  workspaceView: document.querySelector("#workspaceView"),
+  settingsView: document.querySelector("#settingsView"),
+  stepIndicator: document.querySelector("#stepIndicator"),
+  pageTitle: document.querySelector("#pageTitle"),
+  pageDescription: document.querySelector("#pageDescription"),
+  breadcrumbTitle: document.querySelector("#breadcrumbTitle"),
   previewButton: document.querySelector("#previewButton"),
   applyButton: document.querySelector("#applyButton"),
   previewEmpty: document.querySelector("#previewEmpty"),
@@ -37,47 +30,164 @@ const elements = {
   undoLogFile: document.querySelector("#undoLogFile"),
   undoLogName: document.querySelector("#undoLogName"),
   undoLogStatus: document.querySelector("#undoLogStatus"),
+  languageSelect: document.querySelector("#languageSelect"),
   toast: document.querySelector("#toast")
 };
 
 let currentMode = "rename";
+let currentPage = "workspace";
+let currentLanguage = "en";
 let undoLog = null;
 let currentPreview = null;
 let toastTimer = null;
 
-document.querySelectorAll(".nav-item").forEach((button) => {
+document.querySelectorAll(".nav-item[data-mode]").forEach((button) => {
   button.addEventListener("click", () => setMode(button.dataset.mode));
 });
-
+document.querySelector('[data-page="settings"]').addEventListener("click", () => setPage("settings"));
 elements.recursive.addEventListener("change", () => {
   elements.excludeBox.hidden = !elements.recursive.checked;
   clearPreview();
 });
-
 elements.undoLogFile.addEventListener("change", loadUndoLog);
 elements.previewButton.addEventListener("click", previewChanges);
 elements.applyButton.addEventListener("click", applyChanges);
+elements.languageSelect.addEventListener("change", changeLanguage);
+window.addEventListener("popstate", syncRouteFromLocation);
+
+initialize();
+
+async function initialize() {
+  try {
+    await loadDictionaries();
+    try {
+      const savedLanguage = localStorage.getItem("files-editor-language");
+      if (SUPPORTED_LANGUAGES.includes(savedLanguage)) currentLanguage = savedLanguage;
+    } catch (error) {
+      console.warn("Could not read the saved language preference.", error);
+    }
+    elements.languageSelect.value = currentLanguage;
+    syncRouteFromLocation();
+    applyTranslations();
+    renderMode();
+    renderPage();
+  } catch (error) {
+    showToast(error.message, true, 8000);
+  }
+}
+
+async function loadDictionaries() {
+  for (const language of SUPPORTED_LANGUAGES) {
+    const response = await fetch(`/locales/${language}.json`);
+    if (!response.ok) throw new Error(`Could not load the ${language} translation file.`);
+    dictionaries[language] = await response.json();
+  }
+}
+
+function translate(key, values = {}) {
+  const message = key.split(".").reduce((value, part) => value?.[part], dictionaries[currentLanguage]);
+  if (typeof message !== "string") {
+    console.error(`Missing ${currentLanguage} translation: ${key}`);
+    return key;
+  }
+  return message.replace(/\{(\w+)\}/g, (_match, name) => String(values[name] ?? `{${name}}`));
+}
+
+function applyTranslations() {
+  document.documentElement.lang = currentLanguage;
+  document.title = translate("app.title");
+  document.querySelectorAll("[data-i18n]").forEach((element) => {
+    element.textContent = translate(element.dataset.i18n);
+  });
+  document.querySelectorAll("[data-i18n-placeholder]").forEach((element) => {
+    element.placeholder = translate(element.dataset.i18nPlaceholder);
+  });
+  document.querySelectorAll("[data-i18n-aria-label]").forEach((element) => {
+    element.setAttribute("aria-label", translate(element.dataset.i18nAriaLabel));
+  });
+  renderMode();
+  renderPage();
+  if (currentPreview && currentPage === "workspace") renderPreview(currentPreview);
+  if (undoLog) renderUndoLogStatus();
+}
+
+function changeLanguage() {
+  const language = elements.languageSelect.value;
+  if (!SUPPORTED_LANGUAGES.includes(language)) return;
+  currentLanguage = language;
+  try {
+    localStorage.setItem("files-editor-language", currentLanguage);
+  } catch (error) {
+    showToast(translate("messages.preferenceNotSaved"), true, 7000);
+    console.error("Could not save the language preference.", error);
+  }
+  applyTranslations();
+}
 
 function setMode(mode) {
-  if (!modeDetails[mode]) return;
+  if (!["rename", "extensions", "undo"].includes(mode)) return;
   currentMode = mode;
-  document.querySelectorAll(".nav-item").forEach((button) => {
-    const active = button.dataset.mode === mode;
+  currentPage = "workspace";
+  history.pushState({}, "", mode === "rename" ? "/" : `/${mode}`);
+  renderMode();
+  renderPage();
+  clearPreview();
+}
+
+function setPage(page) {
+  if (page !== "settings") return;
+  currentPage = page;
+  history.pushState({}, "", "/settings");
+  renderPage();
+}
+
+function syncRouteFromLocation() {
+  const route = window.location.pathname.replace(/\/+$/, "") || "/";
+  if (route === "/settings") {
+    currentPage = "settings";
+  } else {
+    currentPage = "workspace";
+    currentMode = { "/": "rename", "/extensions": "extensions", "/undo": "undo" }[route] || "rename";
+  }
+  renderMode();
+  renderPage();
+}
+
+function renderMode() {
+  document.querySelectorAll(".nav-item[data-mode]").forEach((button) => {
+    const active = button.dataset.mode === currentMode && currentPage === "workspace";
     button.classList.toggle("active", active);
     button.setAttribute("aria-current", active ? "page" : "false");
   });
-  document.querySelector("#pageTitle").textContent = modeDetails[mode].title;
-  document.querySelector("#breadcrumbTitle").textContent = modeDetails[mode].title;
-  document.querySelector("#pageDescription").textContent = modeDetails[mode].description;
-  elements.renameOptions.hidden = mode !== "rename";
-  elements.extensionOptions.hidden = mode !== "extensions";
-  elements.undoOptions.hidden = mode !== "undo";
-  elements.backupPanel.hidden = mode === "undo";
-  elements.undoBackupPanel.hidden = mode !== "undo";
-  elements.scanOptions.hidden = mode === "undo";
-  elements.previewButton.querySelector("span:first-child").textContent =
-    mode === "undo" ? "Preview restoration" : "Preview changes";
-  clearPreview();
+  elements.renameOptions.hidden = currentMode !== "rename";
+  elements.extensionOptions.hidden = currentMode !== "extensions";
+  elements.undoOptions.hidden = currentMode !== "undo";
+  elements.backupPanel.hidden = currentMode === "undo";
+  elements.undoBackupPanel.hidden = currentMode !== "undo";
+  elements.scanOptions.hidden = currentMode === "undo";
+  elements.previewButton.querySelector("[data-i18n]").dataset.i18n =
+    currentMode === "undo" ? "actions.previewRestoration" : "actions.previewChanges";
+  elements.previewButton.querySelector("[data-i18n]").textContent =
+    translate(elements.previewButton.querySelector("[data-i18n]").dataset.i18n);
+}
+
+function renderPage() {
+  const settings = currentPage === "settings";
+  elements.workspaceView.hidden = settings;
+  elements.settingsView.hidden = !settings;
+  elements.stepIndicator.hidden = settings;
+  const pageKey = settings
+    ? "settings"
+    : { rename: "renamer", extensions: "extensions", undo: "undo" }[currentMode];
+  const navigationKey = settings
+    ? "navigation.settings"
+    : `navigation.${pageKey}`;
+  elements.pageTitle.textContent = translate(`pages.${pageKey}.title`);
+  elements.pageDescription.textContent = translate(`pages.${pageKey}.description`);
+  elements.breadcrumbTitle.textContent = translate(navigationKey);
+  const settingsButton = document.querySelector('[data-page="settings"]');
+  settingsButton.classList.toggle("active", settings);
+  settingsButton.setAttribute("aria-current", settings ? "page" : "false");
 }
 
 function clearPreview() {
@@ -89,12 +199,12 @@ function clearPreview() {
   elements.moreFiles.hidden = true;
   elements.applyButton.hidden = true;
   elements.previewFooter.classList.remove("ready");
-  elements.previewFooterText.textContent = "Nothing changes until you apply.";
+  elements.previewFooterText.textContent = translate("preview.noChangesYet");
 }
 
 function readFolderOptions() {
   const folder = elements.folder.value.trim();
-  if (!folder) throw new Error("Enter the full path to a target folder.");
+  if (!folder) throw new Error(translate("messages.folderRequired"));
 
   const request = { folder };
   if (currentMode !== "undo") {
@@ -135,12 +245,12 @@ function readModeOptions() {
     });
     return { targets };
   }
-  if (!undoLog) throw new Error("Choose a valid undo log first.");
+  if (!undoLog) throw new Error(translate("messages.selectUndoLog"));
   return { log: undoLog };
 }
 
 async function previewChanges() {
-  setBusy(elements.previewButton, true, "Scanning...");
+  setBusy(elements.previewButton, true, "actions.scanning");
   try {
     const request = {
       ...readFolderOptions(),
@@ -150,7 +260,7 @@ async function previewChanges() {
     const response = await apiRequest("/api/preview", request);
     currentPreview = response;
     renderPreview(response);
-    if (response.totalFiles === 0) showToast("No changes are needed for the selected files.", false);
+    if (response.totalFiles === 0) showToast(translate("messages.noChanges"));
   } catch (error) {
     clearPreview();
     showToast(error.message, true);
@@ -166,7 +276,9 @@ function renderPreview(preview) {
   elements.previewSummary.replaceChildren();
 
   const summaryLeft = document.createElement("span");
-  summaryLeft.textContent = preview.totalFiles === 1 ? "1 file will change" : `${preview.totalFiles} files will change`;
+  summaryLeft.textContent = preview.totalFiles === 1
+    ? translate("preview.oneFileWillChange")
+    : translate("preview.manyFilesWillChange", { count: preview.totalFiles });
   const summaryRight = document.createElement("strong");
   summaryRight.textContent = preview.folder;
   summaryRight.title = preview.folder;
@@ -191,24 +303,30 @@ function renderPreview(preview) {
   const remaining = preview.totalFiles - shownEntries.length;
   elements.moreFiles.hidden = remaining <= 0;
   elements.moreFiles.textContent = remaining > 0
-    ? `Showing 100 of ${preview.totalFiles} changes. Apply will process all ${preview.totalFiles} files.`
+    ? translate("preview.showingFirstHundred", { count: preview.totalFiles })
     : "";
   elements.applyButton.hidden = preview.totalFiles === 0;
-  elements.applyButton.textContent = currentMode === "undo" ? "Restore files" : "Apply changes";
+  elements.applyButton.dataset.i18n = currentMode === "undo" ? "actions.restoreFiles" : "actions.applyChanges";
+  elements.applyButton.textContent = translate(elements.applyButton.dataset.i18n);
   elements.previewFooter.classList.add("ready");
   elements.previewFooterText.textContent = preview.totalFiles
-    ? "Review the list, then confirm to continue."
-    : "No files need changes.";
+    ? translate("preview.reviewThenApply")
+    : translate("preview.noFilesNeedChanges");
 }
 
 async function applyChanges() {
   if (!currentPreview) return;
-  const action = currentMode === "undo" ? "restore" : "rename";
-  if (!window.confirm(`This will ${action} ${currentPreview.totalFiles} file(s) in:\n${currentPreview.folder}\n\nContinue?`)) {
-    return;
-  }
+  const isUndo = currentMode === "undo";
+  const confirmation = translate(
+    `messages.confirm${isUndo ? "Restore" : "Rename"}${currentPreview.totalFiles === 1 ? "One" : "Many"}`,
+    {
+      count: currentPreview.totalFiles,
+      folder: currentPreview.folder
+    }
+  );
+  if (!window.confirm(confirmation)) return;
 
-  setBusy(elements.applyButton, true, "Applying...");
+  setBusy(elements.applyButton, true, "actions.applying");
   try {
     const backups = currentMode === "undo"
       ? {
@@ -225,9 +343,16 @@ async function applyChanges() {
       previewId: currentPreview.previewId,
       backups
     });
-    const logMessage = result.log ? ` Undo log: ${result.log}` : "";
-    const backupMessage = result.backups?.length ? ` Backup: ${result.backups.join(", ")}.` : "";
-    showToast(`${result.changed} file(s) ${currentMode === "undo" ? "restored" : "updated"}.${backupMessage}${logMessage}`, false, 9000);
+    const successKey = currentMode === "undo" ? "messages.fileRestored" : "messages.fileUpdated";
+    const pluralKey = currentMode === "undo" ? "messages.filesRestored" : "messages.filesUpdated";
+    const successMessage = translate(result.changed === 1 ? successKey : pluralKey, {
+      count: result.changed
+    });
+    const backupMessage = result.backups?.length
+      ? translate("messages.backupLocation", { paths: result.backups.join(", ") })
+      : "";
+    const logMessage = result.log ? translate("messages.undoLogLocation", { path: result.log }) : "";
+    showToast(`${successMessage}${backupMessage}${logMessage}`, false, 9000);
     clearPreview();
   } catch (error) {
     showToast(error.message, true, 8000);
@@ -241,65 +366,145 @@ async function loadUndoLog(event) {
   undoLog = null;
   clearPreview();
   if (!file) {
-    elements.undoLogName.textContent = "Choose an undo log";
-    elements.undoLogStatus.textContent = "The target folder must match the one recorded in the log.";
+    elements.undoLogName.textContent = translate("undo.chooseLog");
+    elements.undoLogStatus.textContent = translate("undo.folderHelp");
     return;
   }
   if (!file.name.toLowerCase().endsWith(".json") || file.size > 5 * 1024 * 1024) {
     elements.undoLogFile.value = "";
-    elements.undoLogName.textContent = "Choose a JSON file smaller than 5 MB";
-    elements.undoLogStatus.textContent = "This log could not be loaded.";
-    showToast("Select a JSON undo log smaller than 5 MB.", true);
+    elements.undoLogName.textContent = translate("undo.fileTooLarge");
+    elements.undoLogStatus.textContent = translate("undo.folderHelp");
+    showToast(translate("undo.fileTooLarge"), true);
     return;
   }
   try {
     const parsed = JSON.parse(await file.text());
     if (!parsed || !Array.isArray(parsed.renamed_files) || typeof parsed.target_directory !== "string") {
-      throw new Error("This file is not a Files Editor undo log.");
+      throw new Error(translate("undo.invalidFile"));
     }
     undoLog = parsed;
     elements.undoLogName.textContent = file.name;
-    elements.undoLogStatus.textContent = `${parsed.renamed_files.length} recorded change(s). Target: ${parsed.target_directory}`;
     elements.folder.value = parsed.target_directory;
+    renderUndoLogStatus();
   } catch (error) {
     elements.undoLogFile.value = "";
-    elements.undoLogName.textContent = "The selected file is not a valid undo log";
-    elements.undoLogStatus.textContent = error.message;
+    elements.undoLogName.textContent = translate("undo.invalidFile");
+    elements.undoLogStatus.textContent = translate("undo.folderHelp");
     showToast(error.message, true);
   }
 }
 
-async function apiRequest(url, payload) {
-  const response = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload)
+function renderUndoLogStatus() {
+  if (!undoLog) return;
+  const translationKey = undoLog.renamed_files.length === 1 ? "undo.selectedOne" : "undo.selectedMany";
+  elements.undoLogStatus.textContent = translate(translationKey, {
+    count: undoLog.renamed_files.length,
+    folder: undoLog.target_directory
   });
+}
+
+async function apiRequest(url, payload) {
+  let response;
+  try {
+    response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+  } catch {
+    throw new Error(translate("messages.serverUnavailable"));
+  }
   let result;
   try {
     result = await response.json();
   } catch {
-    throw new Error("The local server returned an invalid response.");
+    throw new Error(translate("messages.invalidServerResponse"));
   }
-  if (!response.ok) throw new Error(result.error || `Request failed (${response.status}).`);
+  if (!response.ok) throw new Error(translateServerError(result.error || ""));
   return result;
 }
 
-function setBusy(button, busy, label) {
+function translateServerError(message) {
+  const exact = {
+    "Enter a folder path.": "errors.enterFolder",
+    "The selected path is not a folder.": "errors.notFolder",
+    "Invalid request size.": "errors.invalidRequestSize",
+    "Request body is empty or too large.": "errors.emptyOrLargeRequest",
+    "Request body must contain valid JSON.": "errors.invalidJson",
+    "Request body must be a JSON object.": "errors.invalidRequestObject",
+    "Unknown operation.": "errors.unknownOperation",
+    "The selected folder must match the folder recorded in the undo log.": "errors.wrongFolder",
+    "The selected JSON file is not a valid undo log.": "errors.invalidUndoLog",
+    "The undo log does not contain a target folder.": "errors.missingUndoRoot",
+    "The undo log contains an invalid entry.": "errors.invalidLogEntry",
+    "An undo log entry is missing its file paths.": "errors.missingLogPaths",
+    "The undo log contains a path outside the selected folder.": "errors.outsideFolder",
+    "The undo log contains a file move; only same-folder renames can be restored.": "errors.unsupportedMove",
+    "This preview expired. Preview the changes again before applying them.": "errors.expiredPreview",
+    "There are no changes to apply.": "errors.noChanges",
+    "Backup settings are invalid.": "errors.invalidBackupSettings",
+    "Backup options must be enabled or disabled.": "errors.backupOptionsBoolean",
+    "Subfolder scanning must be enabled or disabled.": "errors.invalidRecursive",
+    "Excluded folders must be a list of folder names.": "errors.excludedList",
+    "The prefix and separator must be text.": "errors.prefixAndSeparatorText",
+    "Category prefixes must be an object.": "errors.categoryPrefixesObject",
+    "Choose one or more valid categories.": "errors.validCategories",
+    "Extension targets must be an object.": "errors.extensionTargetsObject",
+    "Number padding must be a whole number.": "errors.wholeNumberPadding",
+    "Number padding must be between 1 and 12.": "errors.paddingRange",
+    "Requests must come from this local web app.": "errors.localRequestsOnly",
+    "Endpoint not found.": "errors.endpointNotFound"
+  };
+  if (exact[message]) return translate(exact[message]);
+
+  const patterns = [
+    [/^Folder could not be opened: (.*)$/, "errors.folderOpen", (match) => ({ detail: match[1] })],
+    [/^The folder recorded in the log is unavailable: (.*)$/, "errors.undoFolderUnavailable", (match) => ({ detail: match[1] })],
+    [/^Could not list the selected folder: (.*)$/, "errors.folderList", (match) => ({ detail: match[1] })],
+    [/^Could not scan a folder: (.*)$/, "errors.folderScan", (match) => ({ detail: match[1] })],
+    [/^Enter a valid prefix for (.*)\.$/, "errors.invalidPrefix", (match) => ({ category: match[1] })],
+    [/^Invalid extension for (.*): (.*)$/, "errors.invalidExtension", (match) => ({ category: match[1], extension: match[2] })],
+    [/^Enter a valid extension for (.*)\.$/, "errors.validExtension", (match) => ({ category: match[1] })],
+    [/^A file in the preview is no longer available: (.*)$/, "errors.fileNotAvailable", (match) => ({ path: match[1] })],
+    [/^A source file is no longer available: (.*)$/, "errors.sourceNotAvailable", (match) => ({ path: match[1] })],
+    [/^Two files would receive the same name: (.*)$/, "errors.duplicateDestination", (match) => ({ path: match[1] })],
+    [/^A destination already exists: (.*)$/, "errors.destinationExists", (match) => ({ path: match[1] })],
+    [/^A destination appeared during the operation: (.*)$/, "errors.destinationAppeared", (match) => ({ path: match[1] })],
+    [/^Could not create the requested backup: (.*)$/, "errors.createBackup", (match) => ({ detail: match[1] })],
+    [/^Could not load the web interface: (.*)$/, "errors.loadInterface", (match) => ({ detail: match[1] })],
+    [/^File changes were rolled back: (.*?)(?: Rollback also reported: (.*))?$/, "errors.rollback", (match) => ({ detail: match[1] })],
+    [/^A file operation failed: (.*)$/, "errors.applyFailed", (match) => ({ detail: match[1] })]
+  ];
+  for (const [pattern, key, valuesForMatch] of patterns) {
+    const match = message.match(pattern);
+    if (match) {
+      const translated = translate(key, valuesForMatch(match));
+      return key === "errors.rollback" && match[2]
+        ? translated + translate("errors.rollbackAlsoFailed", { detail: match[2] })
+        : translated;
+    }
+  }
+  if (message.includes("outside the selected folder")) return translate("errors.outsideFolder");
+  return message || translate("messages.unknownError");
+}
+
+function setBusy(button, busy, messageKey) {
+  const label = button.querySelector("[data-i18n]");
   if (busy) {
-    button.dataset.originalHtml = button.innerHTML;
+    button.dataset.originalLabelKey = label?.dataset.i18n || "";
+    if (label) label.textContent = translate(messageKey);
     button.disabled = true;
-    button.textContent = label;
     return;
   }
   button.disabled = false;
-  if (button.dataset.originalHtml) {
-    button.innerHTML = button.dataset.originalHtml;
-    delete button.dataset.originalHtml;
+  if (label && button.dataset.originalLabelKey) {
+    label.dataset.i18n = button.dataset.originalLabelKey;
+    label.textContent = translate(button.dataset.originalLabelKey);
   }
+  delete button.dataset.originalLabelKey;
 }
 
-function showToast(message, isError, duration = 5000) {
+function showToast(message, isError = false, duration = 5000) {
   window.clearTimeout(toastTimer);
   elements.toast.textContent = message;
   elements.toast.classList.toggle("error", isError);

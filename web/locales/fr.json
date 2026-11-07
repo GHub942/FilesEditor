@@ -1,0 +1,247 @@
+{
+  "app": {
+    "title": "Files Editor",
+    "name": "FILES EDITOR",
+    "home": "Accueil Files Editor",
+    "localWorkspace": "ESPACE DE TRAVAIL LOCAL",
+    "webVersion": "WEB 1.0",
+    "tagline": "VOS FICHIERS, SUR VOTRE APPAREIL"
+  },
+  "navigation": {
+    "workspace": "ESPACE DE TRAVAIL",
+    "fileTools": "Outils de fichiers",
+    "renamer": "Renommer des fichiers",
+    "extensions": "Modifier les extensions",
+    "undo": "Annuler les changements",
+    "settings": "Paramètres"
+  },
+  "privacy": {
+    "title": "Confidentialité intégrée",
+    "description": "Vos fichiers restent sur cet ordinateur. Aucun téléversement."
+  },
+  "status": {
+    "runningLocally": "En cours d’exécution en local"
+  },
+  "pages": {
+    "renamer": {
+      "title": "Renommer des fichiers",
+      "description": "Nommez vos fichiers de façon cohérente avec une numérotation par catégorie."
+    },
+    "extensions": {
+      "title": "Modifier les extensions",
+      "description": "Modifiez les extensions de fichiers par lots après avoir vérifié l’aperçu."
+    },
+    "undo": {
+      "title": "Annuler les changements",
+      "description": "Restaurez les noms d’origine à partir d’un journal Files Editor."
+    },
+    "settings": {
+      "title": "Paramètres",
+      "description": "Personnalisez votre expérience Files Editor."
+    }
+  },
+  "workflow": {
+    "configure": "CONFIGURER",
+    "preview": "APERÇU",
+    "apply": "APPLIQUER",
+    "title": "FONCTIONNEMENT",
+    "stepConfigure": "Configurer",
+    "stepConfigureHelp": "Choisissez un dossier et définissez vos préférences.",
+    "stepReview": "Vérifier",
+    "stepReviewHelp": "Vérifiez chaque nom proposé avant de continuer.",
+    "stepApply": "Appliquer",
+    "stepApplyHelp": "Confirmez pour modifier les fichiers sur votre appareil."
+  },
+  "operation": {
+    "configuration": "Configuration de l’opération",
+    "confirmationNote": "Aucun changement n’est appliqué sans votre confirmation."
+  },
+  "common": {
+    "required": "OBLIGATOIRE"
+  },
+  "folder": {
+    "title": "Dossier cible",
+    "description": "Choisissez le dossier contenant les fichiers à traiter.",
+    "pathLabel": "CHEMIN DU DOSSIER",
+    "pathPlaceholder": "C:\\Users\\vous\\Documents\\Mes fichiers",
+    "pathHint": "CHEMIN",
+    "pathHelp": "Saisissez le chemin local complet. Exemple :",
+    "examplePath": "C:\\Users\\vous\\Téléchargements",
+    "includeSubfolders": "Inclure les sous-dossiers",
+    "scanDescendants": "Analyser également les dossiers imbriqués",
+    "excludedLabel": "NOMS DES DOSSIERS EXCLUS",
+    "excludedPlaceholder": ".venv, node_modules, .git",
+    "excludedHelp": "Les dossiers de développement et temporaires courants sont exclus par défaut. Saisissez",
+    "excludedHelpEnd": "pour tout inclure."
+  },
+  "rename": {
+    "title": "Format de nommage",
+    "description": "Définissez le modèle appliqué aux fichiers sélectionnés.",
+    "globalPrefix": "PRÉFIXE GLOBAL",
+    "prefixPlaceholder": "Nom du dossier (automatique)",
+    "prefixHelp": "Laissez vide pour utiliser le dossier parent de chaque fichier.",
+    "separator": "SÉPARATEUR",
+    "separatorHelp": "Entre le nom du dossier et la catégorie.",
+    "padding": "CHIFFRES DE NUMÉROTATION",
+    "paddingHelp": "Par exemple, 3 produit 001, 002, 003.",
+    "categories": "CATÉGORIES À RENOMMER",
+    "customPrefixes": "Personnaliser les préfixes des catégories",
+    "prefixAria": {
+      "IMG": "Préfixe des images",
+      "VID": "Préfixe des vidéos",
+      "ARC": "Préfixe des archives",
+      "AUD": "Préfixe des fichiers audio",
+      "DOC": "Préfixe des documents"
+    }
+  },
+  "extensions": {
+    "title": "Extensions cibles",
+    "description": "Choisissez une nouvelle extension de nom de fichier pour chaque catégorie.",
+    "aria": {
+      "IMG": "Extension cible des images",
+      "VID": "Extension cible des vidéos",
+      "AUD": "Extension cible des fichiers audio",
+      "DOC": "Extension cible des documents",
+      "ARC": "Extension cible des archives"
+    },
+    "noticeStart": "Seul le nom du fichier est modifié. Cela ne",
+    "noticeEmphasis": "convertit pas",
+    "noticeEnd": "le contenu du fichier."
+  },
+  "categories": {
+    "images": "Images",
+    "videos": "Vidéos",
+    "audio": "Audio",
+    "documents": "Documents",
+    "archives": "Archives"
+  },
+  "undo": {
+    "title": "Journal d’annulation",
+    "description": "Sélectionnez le journal JSON créé par une opération précédente.",
+    "chooseLog": "Choisir un journal d’annulation",
+    "fileHelp": "Fichiers JSON uniquement · Lecture locale dans le navigateur",
+    "folderHelp": "Le dossier cible doit correspondre à celui indiqué dans le journal.",
+    "invalidFile": "Ce fichier n’est pas un journal d’annulation valide.",
+    "fileTooLarge": "Choisissez un fichier JSON de moins de 5 Mo.",
+    "selectedOne": "1 changement enregistré. Cible : {folder}",
+    "selectedMany": "{count} changements enregistrés. Cible : {folder}"
+  },
+  "backup": {
+    "title": "Sauvegardes de sécurité",
+    "description": "Enregistrées localement dans Desktop\\FilesEditor.",
+    "fullCopy": "Copie complète",
+    "fullCopyHelp": "Conserver l’arborescence d’origine",
+    "zip": "Archive ZIP",
+    "zipHelp": "Copie compressée des fichiers concernés",
+    "undoLog": "Journal d’annulation",
+    "undoLogHelp": "Nécessaire pour restaurer les noms précédents"
+  },
+  "undoBackup": {
+    "title": "Avant la restauration",
+    "description": "Vous pouvez conserver une copie des noms actuels.",
+    "fullCopyHelp": "Conserver l’arborescence actuelle",
+    "zipHelp": "Copie compressée des fichiers concernés"
+  },
+  "preview": {
+    "eyebrow": "VÉRIFIEZ AVANT D’APPLIQUER",
+    "title": "Aperçu des changements",
+    "emptyTitle": "L’aperçu apparaîtra ici",
+    "emptyDescription": "Choisissez un dossier et configurez l’opération pour afficher les changements proposés.",
+    "originalName": "NOM D’ORIGINE",
+    "newName": "NOUVEAU NOM",
+    "change": "Changement",
+    "noChangesYet": "Aucun changement n’est appliqué pour le moment.",
+    "reviewThenApply": "Vérifiez la liste, puis confirmez pour continuer.",
+    "noFilesNeedChanges": "Aucun fichier ne nécessite de changement.",
+    "oneFileWillChange": "1 fichier sera modifié",
+    "manyFilesWillChange": "{count} fichiers seront modifiés",
+    "showingFirstHundred": "Affichage de 100 changements sur {count}. L’application en traitera {count}."
+  },
+  "actions": {
+    "previewChanges": "Prévisualiser les changements",
+    "previewRestoration": "Prévisualiser la restauration",
+    "applyChanges": "Appliquer les changements",
+    "restoreFiles": "Restaurer les fichiers",
+    "scanning": "Analyse en cours…",
+    "applying": "Application en cours…"
+  },
+  "settings": {
+    "languageTitle": "Langue",
+    "languageDescription": "Choisissez la langue utilisée dans Files Editor.",
+    "languageLabel": "LANGUE DE L’INTERFACE",
+    "languageHelp": "Votre préférence linguistique est enregistrée dans ce navigateur, sur cet appareil.",
+    "localTitle": "Traitement local",
+    "localDescription": "Vos fichiers restent sur cet appareil.",
+    "localNote": "Files Editor fonctionne localement, sans téléversement de fichiers ni outil d’analyse d’audience."
+  },
+  "messages": {
+    "noChanges": "Aucun changement n’est nécessaire pour les fichiers sélectionnés.",
+    "confirmRenameOne": "Cette action va renommer 1 fichier dans :\n{folder}\n\nContinuer ?",
+    "confirmRenameMany": "Cette action va renommer {count} fichiers dans :\n{folder}\n\nContinuer ?",
+    "confirmRestoreOne": "Cette action va restaurer 1 fichier dans :\n{folder}\n\nContinuer ?",
+    "confirmRestoreMany": "Cette action va restaurer {count} fichiers dans :\n{folder}\n\nContinuer ?",
+    "actionRename": "renommer",
+    "actionRestore": "restaurer",
+    "fileUpdated": "1 fichier modifié.",
+    "filesUpdated": "{count} fichiers modifiés.",
+    "fileRestored": "1 fichier restauré.",
+    "filesRestored": "{count} fichiers restaurés.",
+    "backupLocation": " Sauvegarde : {paths}.",
+    "undoLogLocation": " Journal d’annulation : {path}",
+    "selectUndoLog": "Choisissez d’abord un journal d’annulation valide.",
+    "folderRequired": "Saisissez le chemin complet du dossier cible.",
+    "invalidServerResponse": "Le serveur local a renvoyé une réponse invalide.",
+    "requestFailed": "Échec de la requête ({status}).",
+    "serverUnavailable": "Impossible de joindre le serveur local. Vérifiez que Files Editor est toujours en cours d’exécution.",
+    "preferenceNotSaved": "La langue a changé, mais ce navigateur n’a pas pu enregistrer votre préférence.",
+    "unknownError": "Une erreur est survenue."
+  },
+  "errors": {
+    "enterFolder": "Saisissez le chemin du dossier.",
+    "notFolder": "Le chemin sélectionné ne correspond pas à un dossier.",
+    "invalidRequestSize": "Taille de requête invalide.",
+    "emptyOrLargeRequest": "La requête est vide ou trop volumineuse.",
+    "invalidJson": "La requête doit contenir du JSON valide.",
+    "invalidRequestObject": "La requête doit être un objet JSON.",
+    "unknownOperation": "Opération inconnue.",
+    "wrongFolder": "Le dossier sélectionné doit correspondre à celui indiqué dans le journal.",
+    "invalidUndoLog": "Le fichier JSON sélectionné n’est pas un journal d’annulation valide.",
+    "missingUndoRoot": "Le journal d’annulation ne contient pas de dossier cible.",
+    "invalidLogEntry": "Le journal d’annulation contient une entrée invalide.",
+    "missingLogPaths": "Une entrée du journal ne contient pas les chemins de fichiers requis.",
+    "outsideFolder": "Le journal contient un chemin situé en dehors du dossier sélectionné.",
+    "unsupportedMove": "Le journal contient un déplacement de fichier ; seule la restauration des renommages dans le même dossier est prise en charge.",
+    "expiredPreview": "Cet aperçu a expiré. Prévisualisez à nouveau les changements avant de les appliquer.",
+    "noChanges": "Aucun changement à appliquer.",
+    "invalidBackupSettings": "Les paramètres de sauvegarde sont invalides.",
+    "backupOptionsBoolean": "Les options de sauvegarde doivent être activées ou désactivées.",
+    "invalidRecursive": "L’analyse des sous-dossiers doit être activée ou désactivée.",
+    "excludedList": "Les dossiers exclus doivent être indiqués sous forme de liste de noms.",
+    "prefixAndSeparatorText": "Le préfixe et le séparateur doivent être du texte.",
+    "categoryPrefixesObject": "Les préfixes des catégories doivent être un objet.",
+    "validCategories": "Choisissez au moins une catégorie valide.",
+    "extensionTargetsObject": "Les extensions cibles doivent être un objet.",
+    "wholeNumberPadding": "Le nombre de chiffres doit être un entier.",
+    "paddingRange": "Le nombre de chiffres doit être compris entre 1 et 12.",
+    "folderOpen": "Impossible d’ouvrir le dossier : {detail}",
+    "undoFolderUnavailable": "Le dossier indiqué dans le journal est indisponible : {detail}",
+    "folderList": "Impossible de lister le dossier sélectionné : {detail}",
+    "folderScan": "Impossible d’analyser un dossier : {detail}",
+    "invalidPrefix": "Saisissez un préfixe valide pour {category}.",
+    "invalidExtension": "Extension invalide pour {category} : {extension}",
+    "validExtension": "Saisissez une extension valide pour {category}.",
+    "fileNotAvailable": "Un fichier de l’aperçu n’est plus disponible : {path}",
+    "sourceNotAvailable": "Un fichier source n’est plus disponible : {path}",
+    "duplicateDestination": "Plusieurs fichiers auraient le même nom : {path}",
+    "destinationExists": "Un fichier portant déjà ce nom existe : {path}",
+    "destinationAppeared": "Un fichier portant ce nom est apparu pendant l’opération : {path}",
+    "createBackup": "Impossible de créer la sauvegarde demandée : {detail}",
+    "rollback": "Les changements de fichiers ont été annulés : {detail}",
+    "rollbackAlsoFailed": " L’annulation a également signalé : {detail}",
+    "applyFailed": "Échec d’une opération sur les fichiers : {detail}",
+    "loadInterface": "Impossible de charger l’interface web : {detail}",
+    "localRequestsOnly": "Les requêtes doivent provenir de cette application locale.",
+    "endpointNotFound": "Point d’accès introuvable.",
+    "outsideFolderError": "en dehors du dossier sélectionné"
+  }
+}
