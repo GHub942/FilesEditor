@@ -13,7 +13,8 @@
     "renamer": "Renommer des fichiers",
     "extensions": "Modifier les extensions",
     "undo": "Annuler les changements",
-    "settings": "Paramètres"
+    "settings": "Paramètres",
+    "notFound": "Page introuvable"
   },
   "privacy": {
     "title": "Confidentialité intégrée",
@@ -34,11 +35,12 @@
     "undo": {
       "title": "Annuler les changements",
       "description": "Restaurez les noms d’origine à partir d’un journal Files Editor."
-    },
-    "settings": {
-      "title": "Paramètres",
-      "description": "Personnalisez votre expérience Files Editor."
     }
+  },
+  "notFound": {
+    "title": "Page introuvable",
+    "description": "La page demandée n’existe pas ou a peut-être été déplacée.",
+    "home": "Retourner à Files Editor"
   },
   "workflow": {
     "configure": "CONFIGURER",
@@ -155,7 +157,10 @@
     "noFilesNeedChanges": "Aucun fichier ne nécessite de changement.",
     "oneFileWillChange": "1 fichier sera modifié",
     "manyFilesWillChange": "{count} fichiers seront modifiés",
-    "showingFirstHundred": "Affichage de 100 changements sur {count}. L’application en traitera {count}."
+    "pagination": "Pages de l’aperçu",
+    "previousPage": "Page précédente",
+    "nextPage": "Page suivante",
+    "pageIndicator": "Page {current} sur {total}"
   },
   "actions": {
     "previewChanges": "Prévisualiser les changements",
@@ -166,6 +171,8 @@
     "applying": "Application en cours…"
   },
   "settings": {
+    "dialogTitle": "Paramètres",
+    "close": "Fermer les paramètres",
     "languageTitle": "Langue",
     "languageDescription": "Choisissez la langue utilisée dans Files Editor.",
     "languageLabel": "LANGUE DE L’INTERFACE",

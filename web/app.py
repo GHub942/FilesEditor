@@ -33,16 +33,17 @@ class FilesEditorHandler(BaseHTTPRequestHandler):
             "/locales/fr.json": ("locales/fr.json", "application/json; charset=utf-8"),
         }
         route = routes.get(urlsplit(self.path).path)
+        status = 200
         if route is None:
-            self.send_error(404)
-            return
+            route = ("index.html", "text/html; charset=utf-8")
+            status = 404
         file_name, content_type = route
         try:
             content = (WEB_DIR / file_name).read_bytes()
         except OSError as error:
             self.send_error(500, f"Could not load the web interface: {error}")
             return
-        self.send_response(200)
+        self.send_response(status)
         self.send_header("Content-Type", content_type)
         self.send_header("Content-Length", str(len(content)))
         self.send_header("Cache-Control", "no-store")

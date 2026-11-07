@@ -19,7 +19,7 @@ python .\WEB\app.py
 
 Open `http://127.0.0.1:8765`. The server binds to the local computer only; keep the terminal window open while using it and press `Ctrl+C` to stop.
 
-The web interface supports English and French. Open **Settings** to choose a language; the preference is stored in the current browser on the current device. File-operation previews are paginated, and unknown web routes display a localized not-found page.
+The web interface supports English and French. Open **Settings** to choose a language; the preference is stored in the current browser on the current device. File-operation previews show 25 entries per page, and unknown web routes display a localized not-found page.
 
 The web app previews file operations before applying them, can make full-copy or ZIP backups, and saves optional JSON undo logs under `Desktop\FilesEditor`. Changing an extension changes the filename only; it does not convert the file contents.
 

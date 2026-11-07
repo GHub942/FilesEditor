@@ -13,7 +13,8 @@
     "renamer": "File renamer",
     "extensions": "Extension editor",
     "undo": "Undo changes",
-    "settings": "Settings"
+    "settings": "Settings",
+    "notFound": "Page not found"
   },
   "privacy": {
     "title": "Private by design",
@@ -34,11 +35,12 @@
     "undo": {
       "title": "Undo changes",
       "description": "Restore original filenames from a Files Editor undo log."
-    },
-    "settings": {
-      "title": "Settings",
-      "description": "Personalize your Files Editor experience."
     }
+  },
+  "notFound": {
+    "title": "Page not found",
+    "description": "The page you requested does not exist or may have moved.",
+    "home": "Return to Files Editor"
   },
   "workflow": {
     "configure": "CONFIGURE",
@@ -155,7 +157,10 @@
     "noFilesNeedChanges": "No files need changes.",
     "oneFileWillChange": "1 file will change",
     "manyFilesWillChange": "{count} files will change",
-    "showingFirstHundred": "Showing 100 of {count} changes. Apply will process all {count} files."
+    "pagination": "Preview pages",
+    "previousPage": "Previous page",
+    "nextPage": "Next page",
+    "pageIndicator": "Page {current} of {total}"
   },
   "actions": {
     "previewChanges": "Preview changes",
@@ -166,6 +171,8 @@
     "applying": "Applying..."
   },
   "settings": {
+    "dialogTitle": "Settings",
+    "close": "Close settings",
     "languageTitle": "Language",
     "languageDescription": "Choose the language used across Files Editor.",
     "languageLabel": "INTERFACE LANGUAGE",

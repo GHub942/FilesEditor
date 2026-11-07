@@ -29,7 +29,7 @@
         <button class="nav-item" type="button" data-mode="undo" aria-current="false">
           <span class="nav-icon">03</span><span data-i18n="navigation.undo">Undo changes</span>
         </button>
-        <button class="nav-item" type="button" data-page="settings" aria-current="false">
+        <button class="nav-item" type="button" data-page="settings" aria-haspopup="dialog" aria-controls="settingsDialog" aria-current="false">
           <span class="nav-icon settings-nav-icon" aria-hidden="true"></span><span data-i18n="navigation.settings">Settings</span>
         </button>
       </nav>
@@ -48,7 +48,7 @@
         <div class="server-status"><span class="status-dot"></span><span data-i18n="status.runningLocally">Running locally</span></div>
       </header>
 
-      <section class="page-heading">
+      <section class="page-heading" id="pageHeading">
         <div>
           <div class="eyebrow"><span class="eyebrow-line"></span><span data-i18n="app.tagline">YOUR FILES, YOUR DEVICE</span></div>
           <h1 id="pageTitle" data-i18n="pages.renamer.title">File renamer</h1>
@@ -211,7 +211,11 @@
                   <tbody id="previewRows"></tbody>
                 </table>
               </div>
-              <p class="more-files" id="moreFiles" hidden></p>
+              <nav class="preview-pagination" id="previewPagination" aria-label="Preview pages" data-i18n-aria-label="preview.pagination" hidden>
+                <button id="previousPreviewPage" class="pagination-button" type="button" aria-label="Previous page" data-i18n-aria-label="preview.previousPage">&lt;</button>
+                <span id="previewPageIndicator" aria-live="polite"></span>
+                <button id="nextPreviewPage" class="pagination-button" type="button" aria-label="Next page" data-i18n-aria-label="preview.nextPage">&gt;</button>
+              </nav>
             </div>
             <div class="preview-footer" id="previewFooter"><span class="footer-shield" aria-hidden="true">+</span><span id="previewFooterText" data-i18n="preview.noChangesYet">Nothing changes until you apply.</span><button id="applyButton" class="apply-button" type="button" hidden data-i18n="actions.applyChanges">Apply changes</button></div>
           </div>
@@ -224,7 +228,18 @@
         </aside>
       </div>
 
-      <section id="settingsView" class="settings-view" hidden>
+      <section id="notFoundView" class="not-found-view" hidden>
+        <div class="not-found-code" aria-hidden="true">404</div>
+        <h1 data-i18n="notFound.title">Page not found</h1>
+        <p data-i18n="notFound.description">The page you requested does not exist or may have moved.</p>
+        <a class="primary-button not-found-home" href="/" data-i18n="notFound.home">Return to Files Editor</a>
+      </section>
+
+      <dialog id="settingsDialog" class="settings-dialog" aria-labelledby="settingsDialogTitle">
+        <div class="settings-dialog-heading">
+          <h2 id="settingsDialogTitle" data-i18n="settings.dialogTitle">Settings</h2>
+          <button id="closeSettingsButton" class="dialog-close" type="button" aria-label="Close settings" data-i18n-aria-label="settings.close">&times;</button>
+        </div>
         <div class="panel settings-panel">
           <div class="panel-heading">
             <span class="panel-icon settings-icon" aria-hidden="true"></span>
@@ -244,7 +259,7 @@
           </div>
           <p class="settings-note" data-i18n="settings.localNote">Files Editor runs locally and does not upload files or use analytics.</p>
         </div>
-      </section>
+      </dialog>
 
       <div class="toast" id="toast" role="status" aria-live="polite"></div>
     </main>

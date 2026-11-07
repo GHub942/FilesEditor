@@ -1,4 +1,5 @@
 const SUPPORTED_LANGUAGES = ["en", "fr"];
+const PREVIEW_PAGE_SIZE = 25;
 const dictionaries = {};
 const elements = {
   folder: document.querySelector("#folderPath"),
@@ -12,7 +13,9 @@ const elements = {
   undoBackupPanel: document.querySelector("#undoBackupPanel"),
   scanOptions: document.querySelector("#scanOptions"),
   workspaceView: document.querySelector("#workspaceView"),
-  settingsView: document.querySelector("#settingsView"),
+  pageHeading: document.querySelector("#pageHeading"),
+  notFoundView: document.querySelector("#notFoundView"),
+  settingsDialog: document.querySelector("#settingsDialog"),
   stepIndicator: document.querySelector("#stepIndicator"),
   pageTitle: document.querySelector("#pageTitle"),
   pageDescription: document.querySelector("#pageDescription"),
@@ -24,7 +27,10 @@ const elements = {
   previewCount: document.querySelector("#previewCount"),
   previewSummary: document.querySelector("#previewSummary"),
   previewRows: document.querySelector("#previewRows"),
-  moreFiles: document.querySelector("#moreFiles"),
+  previewPagination: document.querySelector("#previewPagination"),
+  previousPreviewPage: document.querySelector("#previousPreviewPage"),
+  nextPreviewPage: document.querySelector("#nextPreviewPage"),
+  previewPageIndicator: document.querySelector("#previewPageIndicator"),
   previewFooter: document.querySelector("#previewFooter"),
   previewFooterText: document.querySelector("#previewFooterText"),
   undoLogFile: document.querySelector("#undoLogFile"),
@@ -39,12 +45,14 @@ let currentPage = "workspace";
 let currentLanguage = "en";
 let undoLog = null;
 let currentPreview = null;
+let currentPreviewPage = 0;
 let toastTimer = null;
 
 document.querySelectorAll(".nav-item[data-mode]").forEach((button) => {
   button.addEventListener("click", () => setMode(button.dataset.mode));
 });
-document.querySelector('[data-page="settings"]').addEventListener("click", () => setPage("settings"));
+document.querySelector('[data-page="settings"]').addEventListener("click", openSettingsDialog);
+document.querySelector("#closeSettingsButton").addEventListener("click", () => elements.settingsDialog.close());
 elements.recursive.addEventListener("change", () => {
   elements.excludeBox.hidden = !elements.recursive.checked;
   clearPreview();
@@ -52,6 +60,8 @@ elements.recursive.addEventListener("change", () => {
 elements.undoLogFile.addEventListener("change", loadUndoLog);
 elements.previewButton.addEventListener("click", previewChanges);
 elements.applyButton.addEventListener("click", applyChanges);
+elements.previousPreviewPage.addEventListener("click", () => changePreviewPage(-1));
+elements.nextPreviewPage.addEventListener("click", () => changePreviewPage(1));
 elements.languageSelect.addEventListener("change", changeLanguage);
 window.addEventListener("popstate", syncRouteFromLocation);
 
@@ -134,20 +144,22 @@ function setMode(mode) {
   clearPreview();
 }
 
-function setPage(page) {
-  if (page !== "settings") return;
-  currentPage = page;
-  history.pushState({}, "", "/settings");
-  renderPage();
+function openSettingsDialog() {
+  if (!elements.settingsDialog.open) elements.settingsDialog.showModal();
 }
 
 function syncRouteFromLocation() {
   const route = window.location.pathname.replace(/\/+$/, "") || "/";
   if (route === "/settings") {
-    currentPage = "settings";
-  } else {
+    history.replaceState({}, "", "/");
     currentPage = "workspace";
-    currentMode = { "/": "rename", "/extensions": "extensions", "/undo": "undo" }[route] || "rename";
+    currentMode = "rename";
+    openSettingsDialog();
+  } else {
+    if (elements.settingsDialog.open) elements.settingsDialog.close();
+    const modes = { "/": "rename", "/extensions": "extensions", "/undo": "undo" };
+    currentMode = modes[route] || "rename";
+    currentPage = modes[route] ? "workspace" : "notFound";
   }
   renderMode();
   renderPage();
@@ -172,31 +184,34 @@ function renderMode() {
 }
 
 function renderPage() {
-  const settings = currentPage === "settings";
-  elements.workspaceView.hidden = settings;
-  elements.settingsView.hidden = !settings;
-  elements.stepIndicator.hidden = settings;
-  const pageKey = settings
-    ? "settings"
-    : { rename: "renamer", extensions: "extensions", undo: "undo" }[currentMode];
-  const navigationKey = settings
-    ? "navigation.settings"
-    : `navigation.${pageKey}`;
-  elements.pageTitle.textContent = translate(`pages.${pageKey}.title`);
-  elements.pageDescription.textContent = translate(`pages.${pageKey}.description`);
+  const notFound = currentPage === "notFound";
+  elements.workspaceView.hidden = notFound;
+  elements.pageHeading.hidden = notFound;
+  elements.notFoundView.hidden = !notFound;
+  elements.stepIndicator.hidden = notFound;
+  const pageKey = { rename: "renamer", extensions: "extensions", undo: "undo" }[currentMode];
+  const navigationKey = notFound ? "navigation.notFound" : `navigation.${pageKey}`;
+  if (!notFound) {
+    elements.pageTitle.textContent = translate(`pages.${pageKey}.title`);
+    elements.pageDescription.textContent = translate(`pages.${pageKey}.description`);
+  }
+  document.title = notFound
+    ? `${translate("notFound.title")} | ${translate("app.title")}`
+    : translate("app.title");
   elements.breadcrumbTitle.textContent = translate(navigationKey);
   const settingsButton = document.querySelector('[data-page="settings"]');
-  settingsButton.classList.toggle("active", settings);
-  settingsButton.setAttribute("aria-current", settings ? "page" : "false");
+  settingsButton.classList.remove("active");
+  settingsButton.setAttribute("aria-current", "false");
 }
 
 function clearPreview() {
   currentPreview = null;
+  currentPreviewPage = 0;
   elements.previewCount.textContent = "--";
   elements.previewEmpty.hidden = false;
   elements.previewResults.hidden = true;
   elements.previewRows.replaceChildren();
-  elements.moreFiles.hidden = true;
+  elements.previewPagination.hidden = true;
   elements.applyButton.hidden = true;
   elements.previewFooter.classList.remove("ready");
   elements.previewFooterText.textContent = translate("preview.noChangesYet");
@@ -259,6 +274,7 @@ async function previewChanges() {
     };
     const response = await apiRequest("/api/preview", request);
     currentPreview = response;
+    currentPreviewPage = 0;
     renderPreview(response);
     if (response.totalFiles === 0) showToast(translate("messages.noChanges"));
   } catch (error) {
@@ -274,6 +290,7 @@ function renderPreview(preview) {
   elements.previewResults.hidden = false;
   elements.previewCount.textContent = String(preview.totalFiles);
   elements.previewSummary.replaceChildren();
+  elements.previewRows.replaceChildren();
 
   const summaryLeft = document.createElement("span");
   summaryLeft.textContent = preview.totalFiles === 1
@@ -284,7 +301,10 @@ function renderPreview(preview) {
   summaryRight.title = preview.folder;
   elements.previewSummary.append(summaryLeft, summaryRight);
 
-  const shownEntries = preview.entries.slice(0, 100);
+  const pageCount = Math.max(1, Math.ceil(preview.totalFiles / PREVIEW_PAGE_SIZE));
+  currentPreviewPage = Math.min(currentPreviewPage, pageCount - 1);
+  const firstEntry = currentPreviewPage * PREVIEW_PAGE_SIZE;
+  const shownEntries = preview.entries.slice(firstEntry, firstEntry + PREVIEW_PAGE_SIZE);
   for (const entry of shownEntries) {
     const row = document.createElement("tr");
     const original = document.createElement("td");
@@ -300,11 +320,13 @@ function renderPreview(preview) {
     elements.previewRows.append(row);
   }
 
-  const remaining = preview.totalFiles - shownEntries.length;
-  elements.moreFiles.hidden = remaining <= 0;
-  elements.moreFiles.textContent = remaining > 0
-    ? translate("preview.showingFirstHundred", { count: preview.totalFiles })
-    : "";
+  elements.previewPagination.hidden = pageCount <= 1;
+  elements.previousPreviewPage.disabled = currentPreviewPage === 0;
+  elements.nextPreviewPage.disabled = currentPreviewPage >= pageCount - 1;
+  elements.previewPageIndicator.textContent = translate("preview.pageIndicator", {
+    current: currentPreviewPage + 1,
+    total: pageCount
+  });
   elements.applyButton.hidden = preview.totalFiles === 0;
   elements.applyButton.dataset.i18n = currentMode === "undo" ? "actions.restoreFiles" : "actions.applyChanges";
   elements.applyButton.textContent = translate(elements.applyButton.dataset.i18n);
@@ -312,6 +334,15 @@ function renderPreview(preview) {
   elements.previewFooterText.textContent = preview.totalFiles
     ? translate("preview.reviewThenApply")
     : translate("preview.noFilesNeedChanges");
+}
+
+function changePreviewPage(direction) {
+  if (!currentPreview) return;
+  const pageCount = Math.ceil(currentPreview.totalFiles / PREVIEW_PAGE_SIZE);
+  const nextPage = currentPreviewPage + direction;
+  if (nextPage < 0 || nextPage >= pageCount) return;
+  currentPreviewPage = nextPage;
+  renderPreview(currentPreview);
 }
 
 async function applyChanges() {
