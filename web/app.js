@@ -483,8 +483,8 @@ function setMode(mode) {
 }
 
 function openSettingsDialog() {
-  if (new URL(window.location.href).searchParams.get("settings") !== "true") {
-    const url = new URL(window.location.href);
+  const url = new URL(window.location.href);
+  if (url.searchParams.get("settings") !== "true") {
     url.searchParams.set("settings", "true");
     history.pushState({}, "", `${url.pathname}${url.search}${url.hash}`);
   }
@@ -512,7 +512,7 @@ function syncRouteFromLocation() {
   currentPage = route === "/home" ? "landing" : modes[route] ? "workspace" : "notFound";
   renderMode();
   renderPage();
-  if (new URL(window.location.href).searchParams.get("settings") === "true") {
+  if (new URLSearchParams(window.location.search).get("settings") === "true") {
     if (!elements.settingsDialog.open) elements.settingsDialog.showModal();
   } else if (elements.settingsDialog.open) {
     elements.settingsDialog.close();
@@ -531,10 +531,10 @@ function renderMode() {
   elements.backupPanel.hidden = currentMode === "undo";
   elements.undoBackupPanel.hidden = currentMode !== "undo";
   elements.scanOptions.hidden = currentMode === "undo";
-  elements.previewButton.querySelector("[data-i18n]").dataset.i18n =
+  const previewLabel = elements.previewButton.querySelector("[data-i18n]");
+  previewLabel.dataset.i18n =
     currentMode === "undo" ? "actions.previewRestoration" : "actions.previewChanges";
-  elements.previewButton.querySelector("[data-i18n]").textContent =
-    translate(elements.previewButton.querySelector("[data-i18n]").dataset.i18n);
+  previewLabel.textContent = translate(previewLabel.dataset.i18n);
 }
 
 function renderPage() {
@@ -561,7 +561,7 @@ function renderPage() {
   elements.breadcrumbTitle.textContent = translate(navigationKey);
   const settingsButton = document.querySelector('[data-page="settings"]');
   const homeButton = document.querySelector('.sidebar-quick-nav a[href="/home"]');
-  const settingsOpen = new URL(window.location.href).searchParams.get("settings") === "true";
+  const settingsOpen = new URLSearchParams(window.location.search).get("settings") === "true";
   homeButton.classList.toggle("active", landing);
   homeButton.setAttribute("aria-current", landing ? "page" : "false");
   settingsButton.classList.toggle("active", settingsOpen);
@@ -638,6 +638,13 @@ async function previewChanges() {
   }
 }
 
+function filteredPreviewEntries(preview) {
+  const search = elements.previewSearch.value.trim().toLocaleLowerCase();
+  return preview.entries.filter((entry) =>
+    !search || `${entry.old}\n${entry.new}`.toLocaleLowerCase().includes(search)
+  );
+}
+
 function renderPreview(preview) {
   elements.previewEmpty.hidden = true;
   elements.previewResults.hidden = false;
@@ -654,10 +661,7 @@ function renderPreview(preview) {
   summaryRight.title = preview.folder;
   elements.previewSummary.append(summaryLeft, summaryRight);
 
-  const search = elements.previewSearch.value.trim().toLocaleLowerCase();
-  const entries = preview.entries.filter((entry) =>
-    !search || `${entry.old}\n${entry.new}`.toLocaleLowerCase().includes(search)
-  );
+  const entries = filteredPreviewEntries(preview);
   elements.previewFilterCount.textContent = translate("preview.filterCount", {
     shown: entries.length,
     total: preview.totalFiles
@@ -700,10 +704,7 @@ function renderPreview(preview) {
 
 function changePreviewPage(direction) {
   if (!currentPreview) return;
-  const search = elements.previewSearch.value.trim().toLocaleLowerCase();
-  const filteredCount = currentPreview.entries.filter((entry) =>
-    !search || `${entry.old}\n${entry.new}`.toLocaleLowerCase().includes(search)
-  ).length;
+  const filteredCount = filteredPreviewEntries(currentPreview).length;
   const pageCount = Math.ceil(filteredCount / preferences.pageSize);
   const nextPage = currentPreviewPage + direction;
   if (nextPage < 0 || nextPage >= pageCount) return;

@@ -31,6 +31,12 @@ EXTENSION_TARGETS = {
     "ARC": ".zip",
 }
 
+_EXTENSION_TO_CATEGORY = {
+    extension: category
+    for category, extensions in CATEGORY_EXTENSIONS.items()
+    for extension in extensions
+}
+
 
 class OperationError(ValueError):
     pass
@@ -83,11 +89,7 @@ def _collect_files(root, recursive, excluded_dirs, excluded_extensions=None):
 
 
 def _category_for(path):
-    extension = path.suffix.lower()
-    for category, extensions in CATEGORY_EXTENSIONS.items():
-        if extension in extensions:
-            return category
-    return "FILE"
+    return _EXTENSION_TO_CATEGORY.get(path.suffix.lower(), "FILE")
 
 
 def _sanitize_filename(value, replacement="-"):

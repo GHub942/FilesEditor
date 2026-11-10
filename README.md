@@ -1,57 +1,74 @@
-# Files Editor
+# FilesEditor Legacy
 
-Files Editor contains two local file-management tools:
+> **This repository is frozen.** The project is complete and will not receive
+> further modifications. Active development has moved to
+> [FilesEditor](https://github.com/GHub942/FilesEditor) — please use that repository
+> instead.
 
-- **CLI** — the original interactive Python command-line utilities.
-- **WEB** — a browser interface for renaming files, changing filename extensions, and restoring changes from JSON undo logs.
+## What it is
 
-Both versions work with files on the computer where they are run. The web version uses Python's standard library and has no third-party dependencies or build step.
+A local file-management toolkit. It ships two versions:
 
-## Web version
+- **CLI** — interactive Python command-line utilities for category-based file
+  renaming, extension changes, and restoration from JSON undo logs.
+- **WEB** — a local browser interface (Python standard library only) for
+  renaming files, changing filename extensions, and restoring changes.
 
-Requirements: Python 3.10 or later and a modern browser.
+Both versions work with files on the computer where they are run. The web
+version has no third-party dependencies or build step.
 
-From the project directory, start the local web app:
+Features:
 
-```powershell
-python .\web\app.py
+- Preview every change before applying it, with collision protection
+- Full-copy or ZIP backups and optional JSON undo logs under `Desktop\FilesEditor`
+- English and French interface, system/light/dark/high-contrast themes
+- Searchable, paginated previews and reusable rename presets
+- Guided restore of the latest 50 operations
+
+## Requirements
+
+- Python 3.10+ (standard library only — no pip installs)
+- A modern browser for the web version
+
+## Usage
+
+Web version — from the `WEB/` folder, either:
+
+```bash
+./start.sh        # Linux / macOS / Git Bash
+start.bat         # Windows
 ```
 
-Open `http://127.0.0.1:8765`; the exact root URL redirects to the bilingual landing page at `/home`. The sidebar provides an icon-only Home link and an icon-only Settings button side by side. The server binds to the local computer only; keep the terminal window open while using it and press `Ctrl+C` to stop.
+or manually:
 
-The web tools have direct URLs: `/tools/01` (File Renamer), `/tools/02` (Extension Editor), and `/tools/undo` (Undo Changes). Open **Settings** from the navigation; it is a modal represented by the current URL with `?settings=true`.
+```bash
+python app.py
+```
 
-The interface supports English and French. In Settings, **Do not save preferences** is enabled by default; reloading then resets the language to English and discards presets and operation history. Disable it to save settings, presets, and up to 50 reversible operations in this browser. Settings include system/light/dark/high-contrast themes, preview page sizes (50, 100, or 500), configurable default folder and extension exclusions, and an optional backup prompt before applying changes. Previews can be filtered by original or proposed filename.
+Then open http://127.0.0.1:8765 — the root URL redirects to the bilingual
+landing page at `/home`. Stop with `Ctrl+C` or by closing the terminal.
 
-The web app previews file operations before applying them, can make full-copy or ZIP backups, and saves optional JSON undo logs under `Desktop\FilesEditor`. Changing an extension changes the filename only; it does not convert the file contents.
+CLI version — run a script from the project root, for example:
 
-## CLI version
-
-The original scripts are in [CLI/](./CLI/):
-
-- `renamer.py` — category-based file renaming.
-- `exteditor.py` — category-based extension renaming.
-- `undo_renamer.py` — restore names from a rename log.
-- `undo_exteditor.py` — restore extensions from an extension log.
-
-Run a script from the project root, for example:
-
-```powershell
-python .\CLI\renamer.py
+```bash
+python CLI/renamer.py
+python CLI/exteditor.py
+python CLI/undo_renamer.py
+python CLI/undo_exteditor.py
 ```
 
 The CLI tools prompt for their options and target folders.
 
-## Tests
+## Files
 
-Run the web file-operation tests from the project root:
+| Path              | Purpose                                              |
+| ----------------- | ---------------------------------------------------- |
+| `CLI/`            | Original interactive Python utilities + undo tools  |
+| `WEB/`            | Local web app: `app.py`, `app.js`, `file_operations.py`, locales, tests |
+| `WEB/start.bat`   | Windows launcher                                     |
+| `WEB/start.sh`    | Linux / macOS / Git Bash launcher                    |
+| `LICENSE.md`      | MIT license                                          |
 
-```powershell
-python -m unittest discover -s web\tests -v
-```
+## License
 
-The workflow also runs Chromium browser checks for desktop/mobile layouts, navigation, presets, preview filtering, and guided history restoration. To run these checks locally, install the test-only dependency with `python -m pip install -r requirements-test.txt` and install Chromium with `python -m playwright install chromium`.
-
-## Safety
-
-Use the web app locally only; it is not intended for public network deployment. Review each preview and keep a backup of important files before applying changes.
+MIT — see [LICENSE.md](LICENSE.md).

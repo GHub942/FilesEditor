@@ -1,15 +1,26 @@
-# Security policy
-
-## Supported versions
-
-The current version on the default branch is supported.
+# Security Policy
 
 ## Reporting a vulnerability
 
-Do not disclose vulnerabilities in public issues. Report them privately to the repository owner through GitHub: https://github.com/GHub942
+Please report security issues privately via
+[GitHub Security Advisories](https://github.com/GHub942/FilesEditor/security/advisories/new)
+or by contacting the maintainer directly. Do not open public issues for
+vulnerabilities.
 
-Include steps to reproduce, the affected version, and any relevant impact. Do not include real personal files or sensitive data in a report.
+## Scope
 
-## Local file access
+This is a **frozen legacy version** of FilesEditor. It will not receive
+security patches. Please note:
 
-The web server binds to `127.0.0.1` and is intended for local use only. It can rename files in a folder explicitly selected by the user. Review previews before applying operations and keep backups of important data.
+- Issues that are already fixed in the current version should be reported
+  to [FilesEditor](https://github.com/GHub942/FilesEditor) instead.
+- Since this version is unmaintained, response times are not guaranteed.
+- The application runs entirely locally (`localhost`) and renames files on
+  disk — there is no hosted service to attack.
+
+## Supported versions
+
+| Version  | Supported          |
+| -------- | ------------------ |
+| Legacy   | :x: No fixes       |
+| Current  | See [FilesEditor](https://github.com/GHub942/FilesEditor) |

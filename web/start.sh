@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+cd "$(dirname "$0")"
+python3 app.py 2>/dev/null || python app.py

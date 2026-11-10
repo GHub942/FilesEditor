@@ -125,8 +125,9 @@ class FilesEditorHandler(BaseHTTPRequestHandler):
 
     def _is_local_request(self):
         try:
-            host = urlsplit("//" + self.headers.get("Host", "")).hostname
-            host_port = urlsplit("//" + self.headers.get("Host", "")).port
+            host_url = urlsplit("//" + self.headers.get("Host", ""))
+            host = host_url.hostname
+            host_port = host_url.port
             origin = urlsplit(self.headers.get("Origin", ""))
         except ValueError:
             return False
